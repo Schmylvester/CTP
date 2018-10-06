@@ -1,45 +1,34 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.IO;
+
+public struct Line
+{
+    public string id;
+    public Color colour;
+}
 
 public class PlaceDots : MonoBehaviour
 {
     [SerializeField] GameObject dot_pref;
-    StreamReader file_read;
 
-    private void Start()
+    public void draw(List<List<float>> all_values)
     {
-        List<float> attack_values = getValues("Attack");
-        List<float> health_values = getValues("Health");
-
-        List<List<float>> all_values = new List<List<float>>
-        {
-            attack_values, health_values
-        };
         Vector2 scale = getScale(all_values);
 
-        placeDots(attack_values, Color.red, scale);
-        placeDots(health_values, Color.green, scale);
-    }
+        Line[] lines = new Line[3];
+        lines[0].id = "Attack";
+        lines[0].colour = Color.red;
+        lines[1].id = "Health";
+        lines[1].colour = Color.green;
+        lines[2].id = "Clumsiness";
+        lines[2].colour = Color.yellow;
 
-
-    /// <summary>
-    /// gets all the values from a file
-    /// </summary>
-    /// <param name="file_name">name of file</param>
-    /// <returns>list of floats with all values in the file</returns>
-    List<float> getValues(string file_name)
-    {
-        file_read = new StreamReader("Assets\\StatFiles\\" + file_name + ".txt");
-        List<float> values = new List<float>();
-        while (!file_read.EndOfStream)
+        for (int i = 0; i < all_values.Count; i++)
         {
-            values.Add(float.Parse(file_read.ReadLine()));
+            placeDots(all_values[i], lines[i], scale);
         }
-        return values;
     }
-
 
     /// <summary>
     /// set the values of the dot points for the line graph
@@ -47,16 +36,19 @@ public class PlaceDots : MonoBehaviour
     /// <param name="values">values on the line</param>
     /// <param name="colour">colour of the line</param>
     /// <param name="y_scl">scale to keep higher values on the screen</param>
-    public void placeDots(List<float> values, Color colour, Vector2 scl)
+    public void placeDots(List<float> values, Line line_id, Vector2 scl)
     {
-        Vector3 last = transform.position;
-        for (int i = 0; i < values.Count; i++)
+        int generation = 0;
+        for (int i = 0; i < values.Count; i += values.Count / 50)
         {
+            generation++;
             GameObject dot = Instantiate(dot_pref);
-            dot.transform.position = transform.position + new Vector3(i * scl.x, values[i] * scl.y);
+            float x = (i * scl.x) / (values.Count / 50);
+            float y = (values[i] * scl.y);
+            dot.transform.position = transform.position + new Vector3(x, y);
             DotStats stats = dot.GetComponent<DotStats>();
-            stats.setValues(new Vector2(i, values[i]));
-            dot.GetComponent<SpriteRenderer>().color = colour;
+            stats.setValues(new Vector2(generation, values[i]), line_id.id);
+            dot.GetComponent<SpriteRenderer>().color = line_id.colour;
         }
     }
 
@@ -85,13 +77,7 @@ public class PlaceDots : MonoBehaviour
         {
             y = 8 / max;
         }
-
-        float x;
-        if (all_values.Count != 0)
-            x = (20.0f / all_values[0].Count);
-        else
-            x = 1;
-
-        return new Vector2(x, y);
+        
+        return new Vector2(20.0f / 50, y);
     }
 }

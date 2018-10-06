@@ -38,27 +38,50 @@ public class Evolution : MonoBehaviour
 
             Fighter child = new Fighter
             {
-                attack = (parent_one.attack + parent_two.attack) / 2,
-                max_health = (parent_one.max_health + parent_two.max_health) / 2
+                attack = Random.Range(0, 2) == 0 ? parent_one.attack : parent_two.attack,
+                max_health = Random.Range(0, 2) == 0 ? parent_one.max_health : parent_two.max_health,
+                clumsiness = Random.Range(0, 2) == 0 ? parent_one.clumsiness : parent_two.clumsiness,
             };
             all_fighters.Add(child);
         }
 
-        for (int i = 0; i < all_fighters.Count; i++)
+        int break_trap = 0;
+        for (int i = 0; i < all_fighters.Count && break_trap++ < 1000; i++)
         {
-            //mutation
-            switch (Random.Range(0, 2))
+            bool success = false;
+            while (!success)
             {
-                case 0:
-                    all_fighters[i].attack++;
-                    break;
-                case 1:
-                    all_fighters[i].max_health++;
-                    break;
-                default:
-                    break;
+                //mutation
+                switch (Random.Range(0, 6))
+                {
+                    case 0:
+                        success = changeStat(ref all_fighters[i].attack, ref all_fighters[i].max_health, 1);
+                        break;
+                    case 1:
+                        success = changeStat(ref all_fighters[i].attack, ref all_fighters[i].clumsiness, 1);
+                        break;
+                    case 2:
+                        success = changeStat(ref all_fighters[i].max_health, ref all_fighters[i].attack, 1);
+                        break;
+                    case 3:
+                        success = changeStat(ref all_fighters[i].max_health, ref all_fighters[i].clumsiness, 1);
+                        break;
+                    case 4:
+                        success = changeStat(ref all_fighters[i].clumsiness, ref all_fighters[i].attack, 1);
+                        break;
+                    case 5:
+                        success = changeStat(ref all_fighters[i].clumsiness, ref all_fighters[i].max_health, 1);
+                        break;
+                    default:
+                        break;
+                }
             }
-
+            if (break_trap > 500)
+            {
+                Debug.LogError("Attack: " + all_fighters[i].attack +
+                    " Max Health: " + all_fighters[i].max_health +
+                    " Clumsiness: " + all_fighters[i].clumsiness);
+            }
             //heal everyone
             all_fighters[i].health = all_fighters[i].max_health;
         }
@@ -70,5 +93,16 @@ public class Evolution : MonoBehaviour
     public List<Fighter> getFighters()
     {
         return all_fighters;
+    }
+
+    bool changeStat(ref int increase, ref int decrease, int by)
+    {
+        if (decrease > by)
+        {
+            increase += by;
+            decrease -= by;
+            return true;
+        }
+        return false;
     }
 }

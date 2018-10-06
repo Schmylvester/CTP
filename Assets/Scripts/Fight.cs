@@ -7,8 +7,8 @@ public class Fight : MonoBehaviour
     [SerializeField] Evolution evolution;
     public void fight(Fighter a, Fighter b)
     {
-        int i = 0;
-        while(a.health > 0 && b.health > 0 && i++ < 1000)
+        int break_trap = 0;
+        while(a.health > 0 && b.health > 0 && break_trap++ < 1000)
         {
             a.dealDamage(b);
             if(b.health > 0)
@@ -18,14 +18,16 @@ public class Fight : MonoBehaviour
             else
             {
                 evolution.addWinner(a);
+                break;
             }
             if(a.health <= 0)
             {
                 evolution.addWinner(b);
+                break;
             }
         }
 
-        if(i > 500)
+        if(break_trap > 500)
         {
             Debug.Log("A.H: " + a.health + " A.A: " + a.attack + " B.H: " + b.health + " B.A: " + b.attack);
         }

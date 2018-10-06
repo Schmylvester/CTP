@@ -5,7 +5,8 @@ using UnityEngine.UI;
 
 public class DotStats : MonoBehaviour
 {
-    [SerializeField] Vector2 values;
+    Vector2 values;
+    string m_name;
     Text t;
 
     private void Start()
@@ -16,11 +17,12 @@ public class DotStats : MonoBehaviour
     private void OnMouseEnter()
     {
         NumGenerations n = new NumGenerations();
-        t.text = "Generation: " + values.x * n.getGenerations() / 50 + "\nValue: " + values.y;
+        t.text = m_name + "\nGeneration: " + values.x + "\nValue: " + values.y;
     }
 
-    public void setValues(Vector2 vals)
+    public void setValues(Vector2 vals, string value_name)
     {
         values = vals;
+        m_name = value_name;
     }
 }

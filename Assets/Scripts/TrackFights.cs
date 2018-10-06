@@ -7,16 +7,19 @@ public class TrackFights : MonoBehaviour
 {
     [SerializeField] Evolution evolution;
     [SerializeField] Fight fight;
+    [SerializeField] PlaceDots dots;
     int fights = 0;
     StreamWriter file_write;
 
     List<float> average_attacks;
     List<float> average_healths;
+    List<float> average_clumsiness;
 
     private void Start()
     {
         average_attacks = new List<float>();
         average_healths = new List<float>();
+        average_clumsiness = new List<float>();
         setUpFights();
     }
 
@@ -38,6 +41,16 @@ public class TrackFights : MonoBehaviour
         {
             writeToFile("Attack", average_attacks);
             writeToFile("Health", average_healths);
+            writeToFile("Clumsiness", average_clumsiness);
+
+            List<List<float>> dots_to_draw =
+                new List<List<float>>()
+                {
+                    average_attacks,
+                    average_healths,
+                    average_clumsiness,
+                };
+            dots.draw(dots_to_draw);
         }
     }
 
@@ -54,7 +67,8 @@ public class TrackFights : MonoBehaviour
             {
                 attack = 5,
                 max_health = 50,
-                health = 50
+                health = 50,
+                clumsiness = 150,
             };
             fighters.Add(fighter);
         }
@@ -67,20 +81,24 @@ public class TrackFights : MonoBehaviour
         Fighter average = new Fighter()
         {
             max_health = 0,
-            attack = 0
+            attack = 0,
+            clumsiness = 0
         };
 
         foreach (Fighter f in fighters)
         {
             average.attack += f.attack;
             average.max_health += f.max_health;
+            average.clumsiness += f.clumsiness;
         }
 
         average.attack /= fighters.Count;
         average.max_health /= fighters.Count;
+        average.clumsiness /= fighters.Count;
 
         average_attacks.Add(average.attack);
         average_healths.Add(average.max_health);
+        average_clumsiness.Add(average.clumsiness);
     }
 
     void writeToFile(string file_name, List<float> vals)

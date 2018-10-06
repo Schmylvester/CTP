@@ -7,6 +7,7 @@ public class Fighter
     public int max_health;
     public int health;
     public int attack;
+    public int clumsiness;
 
     public void takeDamage(int damage)
     {
@@ -15,13 +16,11 @@ public class Fighter
 
     public void dealDamage(Fighter target)
     {
-        if (target.max_health > max_health)
-        {
-            target.takeDamage(1);
-        }
-        else
+        if (target.clumsiness > clumsiness)
         {
             target.takeDamage(attack);
         }
+
+        target.takeDamage(attack);
     }
 }
