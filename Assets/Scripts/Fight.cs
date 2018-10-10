@@ -4,32 +4,24 @@ using UnityEngine;
 
 public class Fight : MonoBehaviour
 {
-    [SerializeField] Evolution evolution;
+    [SerializeField] Evolution evolution = null;
     public void fight(Fighter a, Fighter b)
     {
-        int break_trap = 0;
-        while(a.health > 0 && b.health > 0 && break_trap++ < 1000)
+        while (a.getAlive() && b.getAlive())
         {
             a.dealDamage(b);
-            if(b.health > 0)
+            if (b.getAlive())
             {
                 b.dealDamage(a);
+                if (!a.getAlive())
+                {
+                    evolution.addWinner(b);
+                }
             }
             else
             {
                 evolution.addWinner(a);
-                break;
             }
-            if(a.health <= 0)
-            {
-                evolution.addWinner(b);
-                break;
-            }
-        }
-
-        if(break_trap > 500)
-        {
-            Debug.Log("A.H: " + a.health + " A.A: " + a.attack + " B.H: " + b.health + " B.A: " + b.attack);
         }
     }
 }

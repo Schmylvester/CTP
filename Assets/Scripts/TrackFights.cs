@@ -5,15 +5,17 @@ using System.IO;
 
 public class TrackFights : MonoBehaviour
 {
-    [SerializeField] Evolution evolution;
-    [SerializeField] Fight fight;
-    [SerializeField] PlaceDots dots;
+    [SerializeField] Evolution evolution = null;
+    [SerializeField] Fight fight = null;
+    [SerializeField] PlaceDots dots = null;
     int fights = 0;
-    StreamWriter file_write;
 
     List<float> average_attacks;
     List<float> average_healths;
     List<float> average_clumsiness;
+
+    [SerializeField] bool start_from_last_avg = false;
+    bool init = false;
 
     private void Start()
     {
@@ -35,7 +37,7 @@ public class TrackFights : MonoBehaviour
             }
             fights++;
             getAverage(fighters);
-            evolution.evolve();
+            evolution.newBatch();
         }
         else
         {
@@ -56,54 +58,67 @@ public class TrackFights : MonoBehaviour
 
     List<Fighter> initialiseFighters()
     {
-        if (evolution.initialised)
+        if (init)
         {
             return evolution.getFighters();
         }
         List<Fighter> fighters = new List<Fighter>();
         for (int i = 0; i < 100; i++)
         {
-            Fighter fighter = new Fighter
+            int a, h, c;
+            if (start_from_last_avg)
             {
-                attack = 5,
-                max_health = 50,
-                health = 50,
-                clumsiness = 150,
-            };
+                a = GetFromFile("Attack");
+                h = GetFromFile("Health");
+                c = GetFromFile("Clumsiness");
+            }
+            else
+            {
+                a = 15; h = 15; c = 15;
+            }
+            Fighter fighter = new Fighter(h, a, c);
             fighters.Add(fighter);
         }
         evolution.init(fighters);
+        init = true;
         return fighters;
+    }
+
+    int GetFromFile(string file_name)
+    {
+        StreamReader file_read = new StreamReader("Assets\\StatFiles\\" + file_name + ".txt");
+        int ret = 0;
+        while (!file_read.EndOfStream)
+        {
+            ret = int.Parse(file_read.ReadLine());
+        }
+        file_read.Close();
+        return ret;
     }
 
     void getAverage(List<Fighter> fighters)
     {
-        Fighter average = new Fighter()
-        {
-            max_health = 0,
-            attack = 0,
-            clumsiness = 0
-        };
+        int atk = 0, mhp = 0, clm = 0;
 
         foreach (Fighter f in fighters)
         {
-            average.attack += f.attack;
-            average.max_health += f.max_health;
-            average.clumsiness += f.clumsiness;
+            atk += f.getAttack();
+            mhp += f.getMaxHealth();
+            clm += f.getClumsiness();
         }
 
-        average.attack /= fighters.Count;
-        average.max_health /= fighters.Count;
-        average.clumsiness /= fighters.Count;
+        atk /= fighters.Count;
+        mhp /= fighters.Count;
+        clm /= fighters.Count;
 
-        average_attacks.Add(average.attack);
-        average_healths.Add(average.max_health);
-        average_clumsiness.Add(average.clumsiness);
+        average_attacks.Add(atk);
+        average_healths.Add(mhp);
+        average_clumsiness.Add(clm);
     }
 
     void writeToFile(string file_name, List<float> vals)
     {
-        file_write = new StreamWriter("Assets\\StatFiles\\" + file_name + ".txt");
+        StreamWriter file_write = new StreamWriter("Assets\\StatFiles\\" + file_name + ".txt");
         for (int i = 0; i < vals.Count; i += vals.Count / 50)
         {
             file_write.WriteLine(vals[i].ToString());

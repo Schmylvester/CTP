@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public struct Line
 {
@@ -10,7 +11,7 @@ public struct Line
 
 public class PlaceDots : MonoBehaviour
 {
-    [SerializeField] GameObject dot_pref;
+    [SerializeField] GameObject dot_pref = null;
 
     public void draw(List<List<float>> all_values)
     {
@@ -38,11 +39,13 @@ public class PlaceDots : MonoBehaviour
     /// <param name="y_scl">scale to keep higher values on the screen</param>
     public void placeDots(List<float> values, Line line_id, Vector2 scl)
     {
+        GameObject parent = Instantiate(new GameObject(), transform);
+        parent.name = line_id.id;
         int generation = 0;
         for (int i = 0; i < values.Count; i += values.Count / 50)
         {
             generation++;
-            GameObject dot = Instantiate(dot_pref);
+            GameObject dot = Instantiate(dot_pref, parent.transform);
             float x = (i * scl.x) / (values.Count / 50);
             float y = (values[i] * scl.y);
             dot.transform.position = transform.position + new Vector3(x, y);
