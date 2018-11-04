@@ -2,101 +2,103 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum StatID
+public enum Stat
 {
-    MAX_HEALTH,
     ATTACK,
-    CLUMSINESS,
+    DEFENCE,
+    SPEED,
+    Coolness,
+
+    Count
 }
 
 public class Fighter
 {
-    int max_health;
+    int max_health = 50;
     int health;
-    int attack;
-    int clumsiness;
+    int[] tracked_stats;
 
-    public Fighter(int _mhp, int _atk, int _clm)
+    public Fighter(int[] new_stats)
     {
-        max_health = _mhp;
-        health = _mhp;
-        attack = _atk;
-        clumsiness = _clm;
+        tracked_stats = new int[(int)Stat.Count];
+        health = max_health;
+        for (int i = 0; i < (int)Stat.Count; i++)
+        {
+            tracked_stats[i] = new_stats[i];
+        }
     }
 
     public void dealDamage(Fighter target)
     {
-        if (target.clumsiness > clumsiness)
+        if (getStat(Stat.SPEED) > target.getStat(Stat.SPEED))
         {
-            target.takeDamage(attack);
+            target.takeDamage(getStat(Stat.ATTACK) * 3);
         }
-        target.takeDamage(attack);
+        else
+        {
+            target.takeDamage(getStat(Stat.ATTACK) * 2);
+        }
     }
 
-    public void takeDamage(int damage)
+    public int takeDamage(int damage)
     {
+        damage -= getStat(Stat.Coolness) * 2;
+        damage -= getStat(Stat.DEFENCE);
         //always 1 damage at least
         damage = damage > 1 ? damage : 1;
         health -= damage;
+        return damage;
     }
 
     public void mutate()
     {
-        switch (Random.Range(0, 6))
+        int decrease = 2;
+        int increase = 3;
+
+        int dec_stat = Random.Range(0, (int)Stat.Count);
+        int inc_stat = Random.Range(0, (int)Stat.Count);
+
+        if (tracked_stats[dec_stat] > decrease && inc_stat != dec_stat)
         {
-            case 0:
-                changeStat(ref attack, ref max_health);
-                break;
-            case 1:
-                changeStat(ref attack, ref clumsiness);
-                break;
-            case 2:
-                changeStat(ref max_health, ref attack);
-                break;
-            case 3:
-                changeStat(ref max_health, ref clumsiness);
-                break;
-            case 4:
-                changeStat(ref clumsiness, ref attack);
-                break;
-            case 5:
-                changeStat(ref clumsiness, ref max_health);
-                break;
-            default:
-                break;
+            tracked_stats[inc_stat] += increase;
+            tracked_stats[dec_stat] -= decrease;
         }
+
+        normaliseStats();
     }
 
-    bool changeStat(ref int increase, ref int decrease, int i_by = 2, int d_by = 3)
+    void normaliseStats()
     {
-        if (decrease > d_by)
+        int stat_sum = 0;
+        foreach (int i in tracked_stats)
         {
-            increase += i_by;
-            decrease -= d_by;
-            return true;
+            stat_sum += i;
         }
-        return false;
+        for (int i = stat_sum; i > 100; i--)
+        {
+            int r = Random.Range(0, (int)Stat.Count);
+            if (tracked_stats[r] > 1)
+                tracked_stats[r]--;
+        }
     }
 
+    #region ConstantFunctions
     //functions below shouldn't ever need to change
+    public int getStat(Stat stat)
+    {
+        return tracked_stats[(int)stat];
+    }
     public bool getAlive()
     {
         return health > 0;
     }
-    public int getAttack()
+    public void heal(int by = -1)
     {
-        return attack;
+        health += by;
+        if (by == -1 || health > max_health)
+        {
+            health = max_health;
+        }
     }
-    public int getClumsiness()
-    {
-        return clumsiness;
-    }
-    public int getMaxHealth()
-    {
-        return max_health;
-    }
-    public void heal()
-    {
-        health = max_health;
-    }
+    #endregion
 }

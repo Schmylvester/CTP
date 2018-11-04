@@ -11,21 +11,25 @@ public struct Line
 
 public class PlaceDots : MonoBehaviour
 {
+    [SerializeField] Color[] bunch_of_colours;
     [SerializeField] GameObject dot_pref = null;
 
-    public void draw(List<List<float>> all_values)
+    public void draw(List<float>[] all_values)
     {
         Vector2 scale = getScale(all_values);
 
-        Line[] lines = new Line[3];
-        lines[0].id = "Attack";
-        lines[0].colour = Color.red;
-        lines[1].id = "Health";
-        lines[1].colour = Color.green;
-        lines[2].id = "Clumsiness";
-        lines[2].colour = Color.yellow;
+        Line[] lines = new Line[(int)Stat.Count];
+        if (lines.Length > bunch_of_colours.Length)
+        {
+            Debug.LogError("You need to adjust the number of line colours");
+        }
+        for (int i = 0; i < (int)Stat.Count; i++)
+        {
+            lines[i].id = ((Stat)i).ToString();
+            lines[i].colour = bunch_of_colours[i];
+        }
 
-        for (int i = 0; i < all_values.Count; i++)
+        for (int i = 0; i < all_values.Length; i++)
         {
             placeDots(all_values[i], lines[i], scale);
         }
@@ -61,7 +65,7 @@ public class PlaceDots : MonoBehaviour
     /// </summary>
     /// <param name="all_values">All values</param>
     /// <returns>The amount that all values need to be scaled by to fit the highest values into the screen</returns>
-    Vector2 getScale(List<List<float>> all_values)
+    Vector2 getScale(List<float>[] all_values)
     {
         float max = float.MinValue;
         foreach (List<float> values in all_values)
@@ -80,7 +84,7 @@ public class PlaceDots : MonoBehaviour
         {
             y = 8 / max;
         }
-        
+
         return new Vector2(20.0f / 50, y);
     }
 }

@@ -7,7 +7,8 @@ public class Fight : MonoBehaviour
     [SerializeField] Evolution evolution = null;
     public void fight(Fighter a, Fighter b)
     {
-        while (a.getAlive() && b.getAlive())
+        int timer = 0;
+        while (a.getAlive() && b.getAlive() && timer++ < 100)
         {
             a.dealDamage(b);
             if (b.getAlive())
@@ -22,6 +23,11 @@ public class Fight : MonoBehaviour
             {
                 evolution.addWinner(a);
             }
+        }
+        if(timer == 100 )
+        {
+            evolution.addWinner(b);
+            Debug.LogError("Not a good");
         }
     }
 }

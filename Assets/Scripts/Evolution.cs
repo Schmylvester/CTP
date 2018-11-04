@@ -29,16 +29,18 @@ public class Evolution : MonoBehaviour
         }
 
         //breeding
-        for (int i = 0; i < winners.Count; i++)
+        foreach (Fighter fighter in winners)
         {
             Fighter parent_one = winners[Random.Range(0, winners.Count)];
             Fighter parent_two = winners[Random.Range(0, winners.Count)];
 
-            Fighter child = new Fighter
-                (Random.Range(0, 2) == 0 ? parent_one.getAttack() : parent_two.getAttack(),
-                Random.Range(0, 2) == 0 ? parent_one.getMaxHealth() : parent_two.getMaxHealth(),
-                Random.Range(0, 2) == 0 ? parent_one.getClumsiness() : parent_two.getClumsiness());
-            all_fighters.Add(child);
+            int[] child_stats = new int[(int)Stat.Count];
+            for(int i = 0; i < (int)Stat.Count; i++)
+            {
+                child_stats[i] = Random.Range(0, 2) == 0 ? parent_one.getStat((Stat)i) : parent_two.getStat((Stat)i);
+            }
+            
+            all_fighters.Add(new Fighter(child_stats));
         }
         
         for (int i = 0; i < all_fighters.Count; i++)

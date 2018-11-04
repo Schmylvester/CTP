@@ -6,6 +6,6 @@ public class NumGenerations
 {
     public int getGenerations()
     {
-        return 300;
+        return 3000;
     }
 }

@@ -10,18 +10,17 @@ public class TrackFights : MonoBehaviour
     [SerializeField] PlaceDots dots = null;
     int fights = 0;
 
-    List<float> average_attacks;
-    List<float> average_healths;
-    List<float> average_clumsiness;
+    List<float>[] averages;
 
-    [SerializeField] bool start_from_last_avg = false;
     bool init = false;
 
     private void Start()
     {
-        average_attacks = new List<float>();
-        average_healths = new List<float>();
-        average_clumsiness = new List<float>();
+        averages = new List<float>[(int)Stat.Count];
+        for (int i = 0; i < (int)Stat.Count; i++)
+        {
+            averages[i] = new List<float>();
+        }
         setUpFights();
     }
 
@@ -41,18 +40,12 @@ public class TrackFights : MonoBehaviour
         }
         else
         {
-            writeToFile("Attack", average_attacks);
-            writeToFile("Health", average_healths);
-            writeToFile("Clumsiness", average_clumsiness);
+            for (int i = 0; i < (int)Stat.Count; i++)
+            {
+                writeToFile(((Stat)i).ToString(), averages[i]);
+            }
 
-            List<List<float>> dots_to_draw =
-                new List<List<float>>()
-                {
-                    average_attacks,
-                    average_healths,
-                    average_clumsiness,
-                };
-            dots.draw(dots_to_draw);
+            dots.draw(averages);
         }
     }
 
@@ -63,20 +56,14 @@ public class TrackFights : MonoBehaviour
             return evolution.getFighters();
         }
         List<Fighter> fighters = new List<Fighter>();
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < 128; i++)
         {
-            int a, h, c;
-            if (start_from_last_avg)
+            int[] stats = new int[(int)Stat.Count];
+            for (int j = 0; j < (int)Stat.Count; j++)
             {
-                a = GetFromFile("Attack");
-                h = GetFromFile("Health");
-                c = GetFromFile("Clumsiness");
+                stats[j] = 15;
             }
-            else
-            {
-                a = 15; h = 15; c = 15;
-            }
-            Fighter fighter = new Fighter(h, a, c);
+            Fighter fighter = new Fighter(stats);
             fighters.Add(fighter);
         }
         evolution.init(fighters);
@@ -84,36 +71,19 @@ public class TrackFights : MonoBehaviour
         return fighters;
     }
 
-    int GetFromFile(string file_name)
-    {
-        StreamReader file_read = new StreamReader("Assets\\StatFiles\\" + file_name + ".txt");
-        int ret = 0;
-        while (!file_read.EndOfStream)
-        {
-            ret = int.Parse(file_read.ReadLine());
-        }
-        file_read.Close();
-        return ret;
-    }
-
     void getAverage(List<Fighter> fighters)
     {
-        int atk = 0, mhp = 0, clm = 0;
-
-        foreach (Fighter f in fighters)
+        int[] stats = new int[(int)Stat.Count];
+        for (int i = 0; i < (int)Stat.Count; i++)
         {
-            atk += f.getAttack();
-            mhp += f.getMaxHealth();
-            clm += f.getClumsiness();
+            foreach (Fighter f in fighters)
+            {
+                stats[i] += f.getStat((Stat)i);
+            }
+            stats[i] /= fighters.Count;
+
+            averages[i].Add(stats[i]);
         }
-
-        atk /= fighters.Count;
-        mhp /= fighters.Count;
-        clm /= fighters.Count;
-
-        average_attacks.Add(atk);
-        average_healths.Add(mhp);
-        average_clumsiness.Add(clm);
     }
 
     void writeToFile(string file_name, List<float> vals)
