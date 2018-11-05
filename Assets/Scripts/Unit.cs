@@ -4,21 +4,31 @@ using UnityEngine;
 
 public enum Stat
 {
-    ATTACK,
-    DEFENCE,
-    SPEED,
-    Coolness,
+    ATTACK,         //Do more damage
+    DEFENCE,        //Take less damage
+    SPEED,          //Move further
+    CHARISMA,       //Boost ally stats
+    INTELLIGENCE,   //Ability to do magic
+    SIGHT,          //They see further
+    AGILITY,        //They're harder to see
+    ACCURACY,       //Their attack is more likely to hit
+    DODGE,          //Attacks are less likely to hit them    
 
     Count
 }
 
-public class Fighter
+public class Unit
 {
+    Class _class;
+    Vector2Int position;
+
+
     int max_health = 50;
+    int max_total_stats = 40;
     int health;
     int[] tracked_stats;
 
-    public Fighter(int[] new_stats)
+    public Unit(int[] new_stats)
     {
         tracked_stats = new int[(int)Stat.Count];
         health = max_health;
@@ -28,7 +38,7 @@ public class Fighter
         }
     }
 
-    public void dealDamage(Fighter target)
+    public void attack(Unit target)
     {
         if (getStat(Stat.SPEED) > target.getStat(Stat.SPEED))
         {
@@ -42,7 +52,6 @@ public class Fighter
 
     public int takeDamage(int damage)
     {
-        damage -= getStat(Stat.Coolness) * 2;
         damage -= getStat(Stat.DEFENCE);
         //always 1 damage at least
         damage = damage > 1 ? damage : 1;
@@ -74,7 +83,7 @@ public class Fighter
         {
             stat_sum += i;
         }
-        for (int i = stat_sum; i > 100; i--)
+        for (int i = stat_sum; i > max_total_stats; i--)
         {
             int r = Random.Range(0, (int)Stat.Count);
             if (tracked_stats[r] > 1)

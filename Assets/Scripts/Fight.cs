@@ -5,15 +5,15 @@ using UnityEngine;
 public class Fight : MonoBehaviour
 {
     [SerializeField] Evolution evolution = null;
-    public void fight(Fighter a, Fighter b)
+    public void fight(Unit a, Unit b)
     {
         int timer = 0;
         while (a.getAlive() && b.getAlive() && timer++ < 100)
         {
-            a.dealDamage(b);
+            a.attack(b);
             if (b.getAlive())
             {
-                b.dealDamage(a);
+                b.attack(a);
                 if (!a.getAlive())
                 {
                     evolution.addWinner(b);

@@ -29,7 +29,7 @@ public class TrackFights : MonoBehaviour
         NumGenerations n = new NumGenerations();
         if (fights < n.getGenerations())
         {
-            List<Fighter> fighters = initialiseFighters();
+            List<Unit> fighters = initialiseFighters();
             for (int i = 0; i < fighters.Count; i += 2)
             {
                 fight.fight(fighters[i], fighters[i + 1]);
@@ -49,13 +49,13 @@ public class TrackFights : MonoBehaviour
         }
     }
 
-    List<Fighter> initialiseFighters()
+    List<Unit> initialiseFighters()
     {
         if (init)
         {
             return evolution.getFighters();
         }
-        List<Fighter> fighters = new List<Fighter>();
+        List<Unit> fighters = new List<Unit>();
         for (int i = 0; i < 128; i++)
         {
             int[] stats = new int[(int)Stat.Count];
@@ -63,7 +63,7 @@ public class TrackFights : MonoBehaviour
             {
                 stats[j] = 15;
             }
-            Fighter fighter = new Fighter(stats);
+            Unit fighter = new Unit(stats);
             fighters.Add(fighter);
         }
         evolution.init(fighters);
@@ -71,12 +71,12 @@ public class TrackFights : MonoBehaviour
         return fighters;
     }
 
-    void getAverage(List<Fighter> fighters)
+    void getAverage(List<Unit> fighters)
     {
         int[] stats = new int[(int)Stat.Count];
         for (int i = 0; i < (int)Stat.Count; i++)
         {
-            foreach (Fighter f in fighters)
+            foreach (Unit f in fighters)
             {
                 stats[i] += f.getStat((Stat)i);
             }
