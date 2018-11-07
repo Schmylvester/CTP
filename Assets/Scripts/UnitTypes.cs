@@ -4,9 +4,11 @@ using UnityEngine;
 
 public enum Class
 {
-    Warrior,
-    Rogue,
     Mage,
+    Rogue,
+    Warrior,
+
+    UNIT_COUNT
 }
 
 public class UnitTypes : MonoBehaviour

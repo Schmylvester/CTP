@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CreateGrid : MonoBehaviour
 {
+    [SerializeField] AddUnit add_unit;
     [SerializeField] Transform grid_parent;
     [SerializeField] Grid grid;
     [SerializeField] GameObject cell_prefab;
@@ -14,6 +15,10 @@ public class CreateGrid : MonoBehaviour
         cell_objects = new List<Cell>();
         createGrid(20, 10);
         setNeighbours();
+        add_unit.init();
+        add_unit.addUnit(Class.Rogue, new Vector2Int(0, 1));
+        add_unit.addUnit(Class.Warrior, new Vector2Int(0, 2));
+        add_unit.addUnit(Class.Warrior, new Vector2Int(0, 6));
     }
 
     void createGrid(int w, int h)

@@ -22,7 +22,6 @@ public class Unit
     Class _class;
     Vector2Int position;
 
-
     int max_health = 50;
     int max_total_stats = 40;
     int health;
@@ -108,6 +107,11 @@ public class Unit
         {
             health = max_health;
         }
+    }
+
+    public void setClass(Class new_class)
+    {
+        _class = new_class;
     }
     #endregion
 }
