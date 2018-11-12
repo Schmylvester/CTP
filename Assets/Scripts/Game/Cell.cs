@@ -65,6 +65,28 @@ public class Cell : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (Vector2.Distance(Input.mousePosition, Camera.main.WorldToScreenPoint(transform.position)) < 10)
+        {
+            GetComponent<SpriteRenderer>().color = Color.red;
+            foreach (Cell c in neighbours)
+            {
+                if (c) 
+                c.GetComponent<SpriteRenderer>().color = Color.blue;
+            }
+        }
+        else if(GetComponent<SpriteRenderer>().color == Color.red)
+        {
+            setVisible(visibility);
+            foreach (Cell c in neighbours)
+            {
+                if (c)
+                    c.setVisible(visibility);
+            }
+        }
+    }
+
     void setVisible(Visibility set)
     {
         visibility = set;
