@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum Visibility
+{
+    Clear,
+    Foggy,
+    Hidden
+}
 public enum Dir
 {
     N, E, S, W,
@@ -9,13 +15,14 @@ public enum Dir
 
 public class Cell : MonoBehaviour
 {
+    [SerializeField] SpriteRenderer sprite;
     Vector2Int cell_index;
     Cell[] neighbours;
-    SpriteRenderer sprite;
+    Visibility visibility;
 
     private void Awake()
     {
-        sprite = GetComponent<SpriteRenderer>();
+        setVisible(Visibility.Hidden);
         neighbours = new Cell[4] { null, null, null, null };
     }
 
@@ -33,5 +40,45 @@ public class Cell : MonoBehaviour
     {
         neighbours[(int)direction] = cell;
         Dir opposite_dir = (Dir)(((int)(direction) + 2) % 4);
+    }
+
+    public void lightUp(int range, List<Cell> lit)
+    {
+        if (lit.Contains(this))
+        {
+            return;
+        }
+        else
+        {
+            lit.Add(this);
+            range--;
+            if (range > 0)
+            {
+                foreach (Cell c in neighbours)
+                {
+                    if (c)
+                        c.lightUp(range, lit);
+                }
+            }
+
+            setVisible(Visibility.Clear);
+        }
+    }
+
+    void setVisible(Visibility set)
+    {
+        visibility = set;
+        switch (visibility)
+        {
+            case Visibility.Clear:
+                sprite.color = Color.white;
+                break;
+            case Visibility.Foggy:
+                sprite.color = Color.grey / 2;
+                break;
+            case Visibility.Hidden:
+                sprite.color = Color.grey;
+                break;
+        }
     }
 }

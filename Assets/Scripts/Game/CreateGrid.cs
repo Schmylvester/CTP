@@ -10,7 +10,7 @@ public class CreateGrid : MonoBehaviour
     [SerializeField] GameObject cell_prefab;
     List<Cell> cell_objects;
 
-    private void Start()
+    public void loadGrid()
     {
         cell_objects = new List<Cell>();
         createGrid(20, 10);
