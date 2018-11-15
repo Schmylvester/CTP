@@ -6,7 +6,7 @@ public enum Stat
 {
     ATTACK,         //Do more damage
     DEFENCE,        //Take less damage
-    SPEED,          //Move further
+    MOVE,          //Move further
     CHARISMA,       //Boost ally stats
     INTELLIGENCE,   //Ability to do magic
     SIGHT,          //They see further
@@ -39,7 +39,7 @@ public class Unit
 
     public void attack(Unit target)
     {
-        if (getStat(Stat.SPEED) > target.getStat(Stat.SPEED))
+        if (getStat(Stat.MOVE) > target.getStat(Stat.MOVE))
         {
             target.takeDamage(getStat(Stat.ATTACK) * 3);
         }

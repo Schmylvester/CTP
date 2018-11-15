@@ -16,9 +16,11 @@ public enum Dir
 public class Cell : MonoBehaviour
 {
     [SerializeField] SpriteRenderer sprite;
+    GridManager grid;
     Vector2Int cell_index;
     Cell[] neighbours;
     Visibility visibility;
+    GameUnit unit_in_cell = null;
 
     private void Awake()
     {
@@ -26,9 +28,10 @@ public class Cell : MonoBehaviour
         neighbours = new Cell[4] { null, null, null, null };
     }
 
-    public void setPos(int x, int y)
+    public void setPos(int x, int y, GridManager _grid)
     {
         cell_index = new Vector2Int(x, y);
+        grid = _grid;
     }
 
     public Vector2Int getPos()
@@ -42,52 +45,26 @@ public class Cell : MonoBehaviour
         Dir opposite_dir = (Dir)(((int)(direction) + 2) % 4);
     }
 
-    public void lightUp(int range, List<Cell> lit)
+    public void setClearCells(int range, GameUnit _by)
     {
-        if (lit.Contains(this))
+        setVisible(Visibility.Clear);
+        foreach (Cell cell in grid.getCells())
         {
-            return;
-        }
-        else
-        {
-            lit.Add(this);
-            range--;
-            if (range > 0)
+            if (getDistance(cell) <= range)
             {
-                foreach (Cell c in neighbours)
-                {
-                    if (c)
-                        c.lightUp(range, lit);
-                }
-            }
-
-            setVisible(Visibility.Clear);
-        }
-    }
-
-    private void Update()
-    {
-        if (Vector2.Distance(Input.mousePosition, Camera.main.WorldToScreenPoint(transform.position)) < 10)
-        {
-            GetComponent<SpriteRenderer>().color = Color.red;
-            foreach (Cell c in neighbours)
-            {
-                if (c) 
-                c.GetComponent<SpriteRenderer>().color = Color.blue;
+                cell.setVisible(Visibility.Clear, _by);
             }
         }
-        else if(GetComponent<SpriteRenderer>().color == Color.red)
+        foreach (Cell cell in grid.getCells())
         {
-            setVisible(visibility);
-            foreach (Cell c in neighbours)
+            if (getDistance(cell) <= range + 2 && getDistance(cell) > range && cell.getVisible() == Visibility.Hidden)
             {
-                if (c)
-                    c.setVisible(visibility);
+                cell.setVisible(Visibility.Foggy, _by);
             }
         }
     }
 
-    void setVisible(Visibility set)
+    public void setVisible(Visibility set, GameUnit _by = null)
     {
         visibility = set;
         switch (visibility)
@@ -103,4 +80,35 @@ public class Cell : MonoBehaviour
                 break;
         }
     }
+
+    public Visibility getVisible()
+    {
+        return visibility;
+    }
+
+    public int getDistance(Cell cell)
+    {
+        int x = Mathf.Abs(cell.getPos().x - cell_index.x);
+        int y = Mathf.Abs(cell.getPos().y - cell_index.y);
+
+        return x + y;
+    }
+
+    public void unitMove(GameUnit unit, Cell move_to)
+    {
+        if (unit_in_cell == unit)
+        {
+            unit_in_cell = null;
+        }
+        if (move_to == this)
+        {
+            unit_in_cell = unit;
+        }
+    }
+
+    public GameUnit getUnitInCell()
+    {
+        return unit_in_cell;
+    }
+
 }

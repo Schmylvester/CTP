@@ -2,23 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CreateGrid : MonoBehaviour
+public class GridManager : MonoBehaviour
 {
     [SerializeField] AddUnit add_unit;
     [SerializeField] Transform grid_parent;
     [SerializeField] Grid grid;
     [SerializeField] GameObject cell_prefab;
     List<Cell> cell_objects;
+    List<GameUnit> units;
 
     public void loadGrid()
     {
         cell_objects = new List<Cell>();
-        createGrid(20, 10);
-        setNeighbours();
+        units = new List<GameUnit>();
+
+        createGrid(25, 15);
+        //setNeighbours();
         add_unit.init();
-        add_unit.addUnit(Class.Rogue, new Vector2Int(0, 1));
-        add_unit.addUnit(Class.Warrior, new Vector2Int(0, 2));
-        add_unit.addUnit(Class.Warrior, new Vector2Int(0, 6));
+        units.Add(add_unit.addUnit(Class.Rogue, new Vector2Int(0, 1), this));
+        units.Add(add_unit.addUnit(Class.Warrior, new Vector2Int(0, 2), this));
+        units.Add(add_unit.addUnit(Class.Warrior, new Vector2Int(0, 6), this));
     }
 
     void createGrid(int w, int h)
@@ -31,7 +34,7 @@ public class CreateGrid : MonoBehaviour
                 Vector3 position = grid.CellToWorld(new Vector3Int(x, y, 0));
                 Cell cell = Instantiate(cell_prefab, position,
                     Quaternion.identity, grid_parent).GetComponent<Cell>();
-                cell.setPos(x, y);
+                cell.setPos(x, y, this);
                 cell_objects.Add(cell);
             }
         }
@@ -57,6 +60,32 @@ public class CreateGrid : MonoBehaviour
                     else if (pos_a.x == pos_b.x - 1)
                         cell_objects[i].addNeighbour(cell_objects[j], Dir.E);
             }
+        }
+    }
+
+    public void unitMove(GameUnit unit, Cell move_to)
+    {
+        foreach(Cell cell in cell_objects)
+        {
+            cell.unitMove(unit, move_to);
+        }
+        setUpVisibility();
+    }
+
+    public List<Cell> getCells()
+    {
+        return cell_objects;
+    }
+
+    public void setUpVisibility()
+    {
+        foreach(Cell cell in cell_objects)
+        {
+            cell.setVisible(Visibility.Hidden);
+        }
+        foreach(GameUnit unit in units)
+        {
+            unit.getCell().setClearCells(unit.getSight(), unit);
         }
     }
 }

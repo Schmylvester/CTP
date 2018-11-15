@@ -14,7 +14,7 @@ public enum Class
 
 public class UnitStats : MonoBehaviour
 {
-    [SerializeField] CreateGrid create_grid;
+    [SerializeField] GridManager create_grid;
     [SerializeField] Sprite[] sprites;
     List<List<int>> all_unit_stats;
 
@@ -31,10 +31,13 @@ public class UnitStats : MonoBehaviour
         }
 
         all_unit_stats[(int)Class.Warrior][(int)Stat.SIGHT] = 3;
+        all_unit_stats[(int)Class.Warrior][(int)Stat.MOVE] = 2;
 
         all_unit_stats[(int)Class.Rogue][(int)Stat.SIGHT] = 4;
+        all_unit_stats[(int)Class.Rogue][(int)Stat.MOVE] = 3;
 
         all_unit_stats[(int)Class.Mage][(int)Stat.SIGHT] = 3;
+        all_unit_stats[(int)Class.Mage][(int)Stat.MOVE] = 2;
 
         create_grid.loadGrid();
     }
