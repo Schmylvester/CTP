@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class GridManager : MonoBehaviour
 {
+    [SerializeField] InputManager input;
     [SerializeField] AddUnit add_unit;
     [SerializeField] Transform grid_parent;
     [SerializeField] Grid grid;
@@ -16,12 +17,21 @@ public class GridManager : MonoBehaviour
         cell_objects = new List<Cell>();
         units = new List<GameUnit>();
 
-        createGrid(25, 15);
+        createGrid(10, 15);
         //setNeighbours();
         add_unit.init();
-        units.Add(add_unit.addUnit(Class.Rogue, new Vector2Int(0, 1), this));
-        units.Add(add_unit.addUnit(Class.Warrior, new Vector2Int(0, 2), this));
-        units.Add(add_unit.addUnit(Class.Warrior, new Vector2Int(0, 6), this));
+        units.Add(add_unit.addUnit(0, Class.Rogue, new Vector2Int(0, 1), this, input));
+        units.Add(add_unit.addUnit(0, Class.Warrior, new Vector2Int(0, 2), this, input));
+        units.Add(add_unit.addUnit(0, Class.Warrior, new Vector2Int(0, 4), this, input));
+
+        units.Add(add_unit.addUnit(1, Class.Rogue, new Vector2Int(9, 13), this, input));
+        units.Add(add_unit.addUnit(1, Class.Mage, new Vector2Int(9, 12), this, input));
+        units.Add(add_unit.addUnit(1, Class.Warrior, new Vector2Int(9,11), this, input));
+
+        foreach (GameUnit unit in units)
+        {
+            unit.move(unit.getCell());
+        }
     }
 
     void createGrid(int w, int h)
@@ -79,13 +89,52 @@ public class GridManager : MonoBehaviour
 
     public void setUpVisibility()
     {
-        foreach(Cell cell in cell_objects)
+        foreach (Cell cell in cell_objects)
         {
             cell.setVisible(Visibility.Hidden);
         }
-        foreach(GameUnit unit in units)
+        foreach (GameUnit unit in units)
         {
-            unit.getCell().setClearCells(unit.getSight(), unit);
+            if (input.getActivePlayer() == unit.getTeam())
+            {
+                unit.getCell().setClearCells(unit.getStat(Stat.SIGHT), unit);
+            }
         }
+        foreach (GameUnit unit in units)
+        {
+            unit.isVisible();
+        }
+    }
+
+    public void unitKilled(GameUnit unit)
+    {
+        units.Remove(unit);
+        int player_win = units[0].getTeam();
+        foreach(GameUnit alive in units)
+        {
+            if(player_win != alive.getTeam())
+            {
+                player_win = -1;
+            }
+        }
+
+        if(player_win != -1)
+        {
+            Debug.Log("Player " + player_win + " wins!");
+        }
+    }
+
+
+    public List<GameUnit> enemyUnitsVisible(int active_player)
+    {
+        List<GameUnit> to_return = new List<GameUnit>();
+        foreach (GameUnit unit in units)
+        {
+            if(unit.getTeam() != active_player && unit.getVisible())
+            {
+                to_return.Add(unit);
+            }
+        }
+        return to_return;
     }
 }

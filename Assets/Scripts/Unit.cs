@@ -5,8 +5,9 @@ using UnityEngine;
 public enum Stat
 {
     ATTACK,         //Do more damage
+    ATTACK_RANGE,   //Attack further away
     DEFENCE,        //Take less damage
-    MOVE,          //Move further
+    MOVE,           //Move further
     CHARISMA,       //Boost ally stats
     INTELLIGENCE,   //Ability to do magic
     SIGHT,          //They see further

@@ -111,4 +111,15 @@ public class Cell : MonoBehaviour
         return unit_in_cell;
     }
 
+    public void setFlash(Color colour)
+    {
+        if(colour == Color.clear)
+        {
+            setVisible(visibility);
+        }
+        else
+        {
+            sprite.color = colour;
+        }
+    }
 }
