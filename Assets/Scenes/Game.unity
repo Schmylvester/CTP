@@ -144,6 +144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c247f6f9f05ea34e9459067279dcbaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  input: {fileID: 1079066655}
   add_unit: {fileID: 1079066653}
   grid_parent: {fileID: 1220076405}
   grid: {fileID: 1079066651}
@@ -184,7 +185,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38e726313f8688e4a859212dbd2d36c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unit_prefab: {fileID: 1808977825196118, guid: 8534284eca8eada48be7ad836e1171a2,
+  unit_prefab: {fileID: 1279236448891970, guid: 8534284eca8eada48be7ad836e1171a2,
     type: 2}
   grid_parent: {fileID: 1220076405}
   stats: {fileID: 1079066654}
@@ -215,6 +216,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 648135b2da43add4ea72c0a7e980ee10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  players: 2
   grid: {fileID: 1079066650}
 --- !u!1 &1220076404
 GameObject:
