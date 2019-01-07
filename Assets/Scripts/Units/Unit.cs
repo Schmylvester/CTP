@@ -75,8 +75,8 @@ public abstract class Unit : MonoBehaviour
         }
 
         float attack_miss = 0.6f;
-        //reduce miss chance by 10% for each of my accuracy stat points
-        attack_miss *= Mathf.Pow(0.9f, getStat(Stat.Accuracy));
+        //reduce miss chance by 15% for each of my accuracy stat points
+        attack_miss *= Mathf.Pow(0.85f, getStat(Stat.Accuracy));
         //increase miss chance by 5% for each of my target's agility points
         attack_miss *= Mathf.Pow(1.05f, target.getStat(Stat.Agility));
 
@@ -264,6 +264,7 @@ public abstract class Unit : MonoBehaviour
 
         Debug.Log(getName() + " died.");
         grid.getSprite(this).color = Color.red;
+        grid.getSprite(this).flipY = true;
     }
 
     public bool getTaunt()

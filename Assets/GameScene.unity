@@ -2216,6 +2216,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 751763520c28a7441b4395ca3519cd98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: 1
+  opponent_grid: {fileID: 1971266735}
   sprites: {fileID: 2002492313}
   columns:
   - {fileID: 835885874}
@@ -4312,7 +4314,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1499655583
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4343,7 +4345,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -4357,7 +4359,7 @@ MonoBehaviour:
     m_BestFit: 1
     m_MinSize: 10
     m_MaxSize: 300
-    m_Alignment: 4
+    m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
@@ -4365,7 +4367,13 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: 'TODO:
 
-    Implement the swan'
+    Implement the swan
+
+    Implement movement
+
+    Health Bars
+
+    Test'
 --- !u!222 &1499655585
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6451,6 +6459,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 751763520c28a7441b4395ca3519cd98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: 0
+  opponent_grid: {fileID: 698509662}
   sprites: {fileID: 2002492313}
   columns:
   - {fileID: 2111746629}
@@ -6608,6 +6618,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 4a5acdd039ff82f42bca72a24c25e158, type: 3}
   - {fileID: 21300000, guid: bed1fa2d2807fe04da811a1a900ca842, type: 3}
   - {fileID: 21300000, guid: ce22ce956dd1b0e45be034b85a559a93, type: 3}
+  - {fileID: 21300000, guid: 3b6b1d210800d6243ad6f3328eb0cd99, type: 3}
 --- !u!4 &2002492314
 Transform:
   m_ObjectHideFlags: 0
@@ -6810,10 +6821,10 @@ MonoBehaviour:
   grid: {fileID: 698509662}
   targeter: {fileID: 2093374097}
   target_cols:
-  - {fileID: 2111746629}
-  - {fileID: 280120618}
-  - {fileID: 679171327}
   - {fileID: 1563236877}
+  - {fileID: 679171327}
+  - {fileID: 280120618}
+  - {fileID: 2111746629}
   - {fileID: 835885874}
   - {fileID: 377187653}
   - {fileID: 392198354}
@@ -6839,10 +6850,10 @@ MonoBehaviour:
   grid: {fileID: 1971266735}
   targeter: {fileID: 130877697}
   target_cols:
-  - {fileID: 2111746629}
-  - {fileID: 280120618}
-  - {fileID: 679171327}
   - {fileID: 1563236877}
+  - {fileID: 679171327}
+  - {fileID: 280120618}
+  - {fileID: 2111746629}
   - {fileID: 835885874}
   - {fileID: 377187653}
   - {fileID: 392198354}

@@ -103,14 +103,20 @@ public class SetTurnActions : MonoBehaviour
     {
         if (state == InputState.WaitingForActionInput)
         {
-            action_input_received = PlayerActions.None;
-            Unit u = team.getUnits(true)[acting_unit];
-            u.advanceTurn();
-            grid.getSprite(u).color = Color.cyan;
-            ability_ui.SetActive(true);
-            showAbilityUIText(u);
-            input.clearInputs();
-            targeter.SetActive(false);
+            if (acting_unit < team.getUnits(true).Length)
+            {
+                action_input_received = PlayerActions.None;
+                Unit u = team.getUnits(true)[acting_unit];
+                if (u.getHealth() > 0)
+                {
+                    u.advanceTurn();
+                    grid.getSprite(u).color = Color.cyan;
+                }
+                ability_ui.SetActive(true);
+                showAbilityUIText(u);
+                input.clearInputs();
+                targeter.SetActive(false);
+            }
         }
         if (state == InputState.WaitingForTargetInput)
         {
