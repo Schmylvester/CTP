@@ -21,6 +21,13 @@ public class Team
         }
     }
 
+    public void setGridAndField(PlayerGrid _grid, Field field)
+    {
+        grid = _grid;
+        foreach (Unit u in units)
+            u.setGridAndField(grid, field);
+    }
+
     public void addUnit(Unit unit)
     {
         units[next_unit_idx] = unit;
@@ -97,19 +104,36 @@ public class Team
         return return_units;
     }
 
-    public void addSkeletons(int position)
+    public int addSkeletons(int position)
     {
-        for(int i = 0; i < 4; i++)
+        int skeletons_summoned = 0;
+        for (int i = 0; i < 4; i++)
         {
             SummonedSkeleton skeleton = new SummonedSkeleton();
-            if (!grid.addUnitToCol((short)position, skeleton))
+            if (grid.addUnitToCol((short)position, skeleton))
             {
+                skeleton.setTeam(this);
+                skeleton.setGridAndField(grid, null);
                 skeletons.Add(skeleton);
+                skeletons_summoned++;
             }
             else
             {
-                return;
+                grid.updateSprites();
+                return skeletons_summoned;
             }
         }
+        return skeletons_summoned;
+    }
+
+    public bool colEmpty(short col)
+    {
+        short i = 0;
+        foreach(Unit u in units)
+        {
+            if (u.grid_pos.x == col)
+                i++;
+        }
+        return i == 0;
     }
 }

@@ -16,12 +16,14 @@ public class Bard : Unit
 
     protected override void setStats()
     {
-        base_stats[(int)Stat.Accuracy] = 6;
-        base_stats[(int)Stat.Agility] = 10;
-        base_stats[(int)Stat.Attack] = 4;
-        base_stats[(int)Stat.Defence] = 4;
-        base_stats[(int)Stat.Intelligence] = 10;
-        base_stats[(int)Stat.Max_HP] = 9;
-        base_stats[(int)Stat.Speed] = 6;
+        base_stats[(int)Stat.Accuracy] = 60;
+        base_stats[(int)Stat.Agility] = 100;
+        base_stats[(int)Stat.Attack] = 40;
+        base_stats[(int)Stat.Defence] = 40;
+        base_stats[(int)Stat.Intelligence] = 100;
+        base_stats[(int)Stat.Max_HP] = 90;
+        base_stats[(int)Stat.Speed] = 60;
+
+        validateStats(490);
     }
 }

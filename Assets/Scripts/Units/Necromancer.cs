@@ -16,12 +16,15 @@ public class Necromancer : Unit
 
     protected override void setStats()
     {
-        base_stats[(int)Stat.Accuracy] = 5;
-        base_stats[(int)Stat.Agility] = 8;
-        base_stats[(int)Stat.Attack] = 6;
-        base_stats[(int)Stat.Defence] = 5;
-        base_stats[(int)Stat.Intelligence] = 10;
-        base_stats[(int)Stat.Max_HP] = 9;
-        base_stats[(int)Stat.Speed] = 6;
+        base_stats[(int)Stat.Accuracy] = 50;
+        base_stats[(int)Stat.Agility] = 80;
+        base_stats[(int)Stat.Attack] = 60;
+        base_stats[(int)Stat.Defence] = 50;
+        base_stats[(int)Stat.Intelligence] = 100;
+        base_stats[(int)Stat.Max_HP] = 90;
+        base_stats[(int)Stat.Speed] = 60;
+
+        validateStats(490);
+
     }
 }

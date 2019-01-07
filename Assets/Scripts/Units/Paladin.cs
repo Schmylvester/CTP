@@ -16,12 +16,14 @@ public class Paladin : Unit
 
     protected override void setStats()
     {
-        base_stats[(int)Stat.Accuracy] = 7;
-        base_stats[(int)Stat.Agility] = 4;
-        base_stats[(int)Stat.Attack] = 8;
-        base_stats[(int)Stat.Defence] = 9;
-        base_stats[(int)Stat.Intelligence] = 8;
-        base_stats[(int)Stat.Max_HP] = 9;
-        base_stats[(int)Stat.Speed] = 4;
+        base_stats[(int)Stat.Accuracy] = 70;
+        base_stats[(int)Stat.Agility] = 40;
+        base_stats[(int)Stat.Attack] = 80;
+        base_stats[(int)Stat.Defence] = 90;
+        base_stats[(int)Stat.Intelligence] = 80;
+        base_stats[(int)Stat.Max_HP] = 90;
+        base_stats[(int)Stat.Speed] = 40;
+
+        validateStats(490);
     }
 }

@@ -18,12 +18,14 @@ public class Rogue : Unit
     
     protected override void setStats()
     {
-        base_stats[(int)Stat.Accuracy] = 9;
-        base_stats[(int)Stat.Agility] = 9;
-        base_stats[(int)Stat.Attack] = 5;
-        base_stats[(int)Stat.Defence] = 5;
-        base_stats[(int)Stat.Intelligence] = 6;
-        base_stats[(int)Stat.Max_HP] = 6;
-        base_stats[(int)Stat.Speed] = 9;
+        base_stats[(int)Stat.Accuracy] = 90;
+        base_stats[(int)Stat.Agility] = 90;
+        base_stats[(int)Stat.Attack] = 50;
+        base_stats[(int)Stat.Defence] = 50;
+        base_stats[(int)Stat.Intelligence] = 60;
+        base_stats[(int)Stat.Max_HP] = 60;
+        base_stats[(int)Stat.Speed] = 90;
+
+        validateStats(490);
     }
 }

@@ -16,12 +16,14 @@ public class Knight : Unit
 
     protected override void setStats()
     {
-        base_stats[(int)Stat.Accuracy] = 7;
-        base_stats[(int)Stat.Agility] = 6;
-        base_stats[(int)Stat.Attack] = 8;
-        base_stats[(int)Stat.Defence] = 8;
-        base_stats[(int)Stat.Intelligence] = 6;
-        base_stats[(int)Stat.Max_HP] = 8;
-        base_stats[(int)Stat.Speed] = 6;
+        base_stats[(int)Stat.Accuracy] = 70;
+        base_stats[(int)Stat.Agility] = 60;
+        base_stats[(int)Stat.Attack] = 80;
+        base_stats[(int)Stat.Defence] = 80;
+        base_stats[(int)Stat.Intelligence] = 60;
+        base_stats[(int)Stat.Max_HP] = 80;
+        base_stats[(int)Stat.Speed] = 60;
+
+        validateStats(490);
     }
 }

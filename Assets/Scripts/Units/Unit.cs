@@ -23,16 +23,17 @@ public enum SingleTurnEffects
     DownWithShip = 16,
 }
 
-public abstract class Unit : MonoBehaviour
+public abstract class Unit
 {
     protected int current_health;
     protected int[] base_stats;
     protected int[] temp_stats;
+    protected Field field;
     protected PlayerGrid grid;
     public Vector2Int grid_pos;
     protected List<Ability> abilities;
     protected Team team;
-
+    public SetTurnActions actions;
     public bool berserk = false;
     int effects = 0;
     public Unit taunted_by = null;
@@ -47,8 +48,7 @@ public abstract class Unit : MonoBehaviour
         base_stats = new int[(int)Stat.COUNT];
         temp_stats = new int[(int)Stat.COUNT];
         setStats();
-        validateStats();
-        base_stats[(int)Stat.Max_HP] = 30 + (base_stats[(int)Stat.Max_HP] * 3);
+        base_stats[(int)Stat.Max_HP] = 300 + (base_stats[(int)Stat.Max_HP] * 3);
         resetStats();
         current_health = getStat(Stat.Max_HP);
         abilities = new List<Ability>();
@@ -60,25 +60,29 @@ public abstract class Unit : MonoBehaviour
         }
     }
 
-    public void setGrid(PlayerGrid _grid)
-    { grid = _grid; }
+    public void setGridAndField(PlayerGrid _grid, Field _field)
+    {
+        grid = _grid;
+        field = _field;
+        for (int i = 0; i < abilities.Count; i++)
+            abilities[i].setField(field);
+    }
 
-    public void attack(Unit target, bool distance_penalty = true)
+    public int attack(Unit target, bool distance_penalty = true)
     {
         if (taunted_by != null)
         {
             resetStats();
             target = taunted_by;
             taunted_by = null;
-            attack(target);
-            return;
+            return attack(target);
         }
 
         float attack_miss = 0.6f;
-        //reduce miss chance by 15% for each of my accuracy stat points
-        attack_miss *= Mathf.Pow(0.85f, getStat(Stat.Accuracy));
-        //increase miss chance by 5% for each of my target's agility points
-        attack_miss *= Mathf.Pow(1.05f, target.getStat(Stat.Agility));
+        //reduce miss chance by 1.5% for each of my accuracy stat points
+        attack_miss *= Mathf.Pow(0.985f, getStat(Stat.Accuracy));
+        //increase miss chance by 0.5% for each of my target's agility points
+        attack_miss *= Mathf.Pow(1.005f, target.getStat(Stat.Agility));
 
         if (distance_penalty)
         {
@@ -87,8 +91,8 @@ public abstract class Unit : MonoBehaviour
             //for each space the target is back, add 60% to the attack miss
             attack_miss *= Mathf.Pow(1.6f, target.getPos());
         }
-
-        if (Random.Range(0.0f, 1.0f) > attack_miss)
+        attack_miss = Mathf.Min(attack_miss, 0.96f);
+        if (Random.Range(0.0f, 1.0f) > attack_miss || this == target)
         {
             if ((this as Rogue) != null)
             {
@@ -99,32 +103,34 @@ public abstract class Unit : MonoBehaviour
             int base_damage = 0;
             for (int i = 0; i < getStat(Stat.Attack); i++)
             {
-                base_damage += Random.Range(1, 4);
+                base_damage += Random.Range(2, 5);
             }
-            target.takeDamage(base_damage);
+            int dam = target.takeDamage(base_damage);
+            return dam;
         }
         else
-            Debug.Log("Attack had a " + ((int)((1 - attack_miss) * 100)).ToString() + "% chance of hitting, but it missed.");
+            new ActionFeedbackText().printMessage(getName() + "'s attack had a " + ((int)((1 - attack_miss) * 100)).ToString() + "% chance of hitting " + target.getName() + " but it missed.");
+        return 0;
     }
+
 
     public int takeDamage(int damage)
     {
         if (defended_by != null)
         {
-            Debug.Log("Attack blocked by " + defended_by.getName());
+            new ActionFeedbackText().printMessage("Attack blocked by " + defended_by.getName());
             return defended_by.takeDamage(damage);
         }
         if ((this as Rogue) != null)
             (this as Rogue).sneak_turns = 0;
-        int damage_taken = 0;
+        int damage_taken = damage;
         for (int i = 0; i < getStat(Stat.Defence); i++)
         {
-            damage_taken += Random.Range(1, 3);
+            damage_taken -= Random.Range(1, 4);
         }
-        //if the attack hits, at least one damage
-        damage_taken = Mathf.Max(1, damage_taken);
+        //if the attack hits, at least 15 damage
+        damage_taken = Mathf.Max(15, damage_taken);
         changeHealth(-damage_taken);
-        Debug.Log("Attack hits for " + damage_taken + " damage.");
         if (current_health <= 0)
         {
             die();
@@ -150,18 +156,26 @@ public abstract class Unit : MonoBehaviour
         return current_health;
     }
 
-    public void changeHealth(int change)
+    public int changeHealth(int change)
     {
+        if (current_health == 0)
+        {
+            grid.getSprite(this).color = Color.white;
+            grid.getSprite(this).flipY = false;
+        }
+        int start_health = current_health;
         current_health += change;
         current_health = Mathf.Min(current_health, getStat(Stat.Max_HP));
         current_health = Mathf.Max(current_health, 0);
         if (current_health <= 0)
             die();
+        return current_health - start_health;
     }
 
-    public int getStat(Stat stat, bool temp = true)
+    public int getStat(Stat stat)
     {
-        return temp ? temp_stats[(int)stat] : base_stats[(int)stat];
+        int ret = temp_stats[(int)stat];
+        return ret;
     }
 
     public void changeStat(Stat stat, float change)
@@ -170,21 +184,21 @@ public abstract class Unit : MonoBehaviour
         resetStat(stat);
     }
 
-    public void changeStat(Stat stat, int change)
-    {
-        base_stats[(int)stat] += change;
-        resetStat(stat);
-    }
+    //public void changeStat(Stat stat, int change)
+    //{
+    //    base_stats[(int)stat] += change;
+    //    resetStat(stat);
+    //}
 
     public void modifyStat(Stat stat, float mod)
     {
         temp_stats[(int)stat] = (int)(temp_stats[(int)stat] * mod);
     }
 
-    public void modifyStat(Stat stat, int mod)
-    {
-        temp_stats[(int)stat] += mod;
-    }
+    //public void modifyStat(Stat stat, int mod)
+    //{
+    //    temp_stats[(int)stat] += mod;
+    //}
 
     protected void resetStat(Stat stat)
     {
@@ -220,23 +234,22 @@ public abstract class Unit : MonoBehaviour
         return abilities[index];
     }
 
-    bool validateStats()
+    protected bool validateStats(int exp_total)
     {
         int total = 0;
-
         for (int i = 0; i < (int)Stat.COUNT; i++)
         {
             total += base_stats[i];
         }
 
-        if (total < 49)
+        if (total < exp_total)
         {
-            Debug.LogError(getName() + " is underpowered by " + (49 - total) + " point(s).");
+            Debug.LogError(getName() + " is underpowered by " + (exp_total - total) + " point(s).");
             return false;
         }
-        if (total > 49)
+        if (total > exp_total)
         {
-            Debug.LogError(getName() + " is overpowered by " + (total - 49) + " point(s).");
+            Debug.LogError(getName() + " is overpowered by " + (total - exp_total) + " point(s).");
             return false;
         }
         return true;
@@ -248,22 +261,29 @@ public abstract class Unit : MonoBehaviour
         {
             if (Random.Range(0.0f, 1.0f) < 0.8f)
             {
-                Debug.Log(getName() + " cheated death.");
+                new ActionFeedbackText().printMessage(getName() + " cheated death.");
                 current_health = 1;
                 return;
             }
         }
         if (getEffectActive(SingleTurnEffects.DownWithShip))
         {
-            Debug.Log(getName() + " is taking you with them.");
-            foreach (Unit u in FindObjectOfType<Field>().getTeam(1 - team.player_id).getUnits(true))
+            new ActionFeedbackText().printMessage(getName() + " is taking you with them.");
+            foreach (Unit u in field.getTeam(1 - team.player_id).getUnits(true))
             {
                 attack(u);
             }
         }
 
-        Debug.Log(getName() + " died.");
-        grid.getSprite(this).color = Color.red;
+        if (getEffectActive(SingleTurnEffects.SwanSong))
+        {
+            new ActionFeedbackText().printMessage(getName() + " was singing a really nice song, so now their team all get two actions next turn.");
+            actions.swan_active = true;
+        }
+
+        new ActionFeedbackText().printMessage(getName() + " died.");
+
+        grid.getSprite(this).color = Color.white - new Color(0, 0, 0, 0.5f);
         grid.getSprite(this).flipY = true;
     }
 
@@ -272,29 +292,31 @@ public abstract class Unit : MonoBehaviour
         return taunted_by != null;
     }
 
-    public void move(char dir)
+    public bool moveValid(char dir)
     {
         short target_col = (short)grid_pos.x;
         if (dir == 'f')
         {
-            if (grid_pos.x == 7 || grid_pos.x == 3)
+            if (grid_pos.x == 0)
             {
-                Debug.Log("You can't move there you're on the edge or your area.");
-            }
-            else
-            {
-                target_col++;
-            }
-        }
-        else if (dir == 'b')
-        {
-            if (grid_pos.x == 0 || grid_pos.x == 4)
-            {
-                Debug.Log("You can't move there you're on the edge or your area.");
+                new ActionFeedbackText().printMessage("You can't move into the enemy zone.", MessageType.Error);
+                return false;
             }
             else
             {
                 target_col--;
+            }
+        }
+        else if (dir == 'b')
+        {
+            if (grid_pos.x == 3)
+            {
+                new ActionFeedbackText().printMessage("You can't move off the grid.", MessageType.Error);
+                return false;
+            }
+            else
+            {
+                target_col++;
             }
         }
         else
@@ -304,20 +326,50 @@ public abstract class Unit : MonoBehaviour
         }
 
         short pos = (short)grid_pos.x;
+        if (grid.checkAdd(target_col))
+        {
+            return true;
+        }
+        else
+        {
+            new ActionFeedbackText().printMessage("That unit can not move there because it is full up.", MessageType.Error);
+            return false;
+        }
+    }
+
+    public void move(char dir)
+    {
+        short target_col = (short)grid_pos.x;
+        if (dir == 'f')
+        {
+            target_col--;
+        }
+        else if (dir == 'b')
+        {
+            target_col++;
+        }
+        short pos = (short)grid_pos.x;
         if (grid.addUnitToCol(target_col, this))
         {
-            grid.removeUnitFromCol(pos);
+            grid.updateGrid();
             grid.updateSprites();
         }
         else
         {
-            Debug.Log("That unit can not move there because it is full up.");
+            new ActionFeedbackText().printMessage("At the start of the turn, " + getName() + " wanted to move, and they could, but now they can not.");
         }
     }
 
     public int getPos()
     {
-        //starting with the row in front, ending when there's a populated row or once the front row is checked
-        return 0;
+        int pos = grid_pos.x;
+        for(short i = (short)grid_pos.x; i >= 0; i--)
+        {
+            if(team.colEmpty(i))
+            {
+                pos--;
+            }
+        }
+        return pos;
     }
 }

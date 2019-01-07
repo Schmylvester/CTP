@@ -25,6 +25,8 @@ public enum PlayerActions
 public class SetTurnActions : MonoBehaviour
 {
     bool inputs_sent = false;
+    bool changed_state_this_frame = false;
+    public bool swan_active = false;
     Field field;
     Team team;
     InputManager input;
@@ -52,8 +54,9 @@ public class SetTurnActions : MonoBehaviour
         field = FindObjectOfType<Field>();
         team = field.getTeam(player);
         setInputState(InputState.WaitingForActionInput);
+        team.setGridAndField(grid, field);
         foreach (Unit u in team.getUnits(true))
-            u.setGrid(grid);
+            u.actions = this;
     }
 
     private void Update()
@@ -86,25 +89,44 @@ public class SetTurnActions : MonoBehaviour
                 }
                 else
                 {
-                    action_manager.addActions(action_queue);
-                    inputs_sent = true;
-                    setInputState(InputState.WaitingForOtherPlayer);
+                    action_manager.addActions(action_queue, swan_active);
+                    if (swan_active)
+                    {
+                        Debug.Log("I acknowledge that swan is active");
+                        swan_active = false;
+                        acting_unit = 0;
+                        setInputState(InputState.WaitingForActionInput);
+                    }
+                    else
+                    {
+                        Debug.Log("Setting inputs sent to true for player " + player);
+                        inputs_sent = true;
+                        setInputState(InputState.WaitingForOtherPlayer);
+                    }
                 }
             }
             else
             {
-                Debug.Log("Game over and team " + (1 + (1 - player)) + " won");
+                new ActionFeedbackText().printMessage("Game over and team " + (1 + (1 - player)) + " won");
                 enabled = false;
             }
         }
+        changed_state_this_frame = false;
     }
 
     void setInputState(InputState state)
     {
+        changed_state_this_frame = true;
         if (state == InputState.WaitingForActionInput)
         {
             if (acting_unit < team.getUnits(true).Length)
             {
+                if (team.getUnits(true)[acting_unit].getName() == "Skeleton")
+                {
+                    setInputState(InputState.WaitingForTargetInput);
+                    action_input_received = PlayerActions.Attack;
+                    return;
+                }
                 action_input_received = PlayerActions.None;
                 Unit u = team.getUnits(true)[acting_unit];
                 if (u.getHealth() > 0)
@@ -114,7 +136,6 @@ public class SetTurnActions : MonoBehaviour
                 }
                 ability_ui.SetActive(true);
                 showAbilityUIText(u);
-                input.clearInputs();
                 targeter.SetActive(false);
             }
         }
@@ -122,9 +143,8 @@ public class SetTurnActions : MonoBehaviour
         {
             target = null;
             ability_ui.SetActive(false);
-            col_selected = (short)((1 - player) * 7);
+            col_selected = (short)(player + 3);
             targeter.SetActive(true);
-            input.clearInputs();
         }
         if (state == InputState.ActionAndTargetReceived)
         {
@@ -165,18 +185,14 @@ public class SetTurnActions : MonoBehaviour
                     acting_unit++;
                     grid.getSprite(u).color = Color.white;
                 }
-                else if (!action.getRequiredTarget())
-                {
-                    Debug.Log("The target wasn't valid for that acion.");
-                }
                 else if (!action.canUse())
                 {
-                    Debug.Log("Hey sorry you ran out of uses for that.");
+                    new ActionFeedbackText().printMessage("Hey sorry you ran out of uses for that.", MessageType.Error);
                 }
             }
             else
             {
-                Debug.Log("That was for some reason invalid");
+                Debug.LogError("That was for some reason invalid");
             }
             setInputState(InputState.WaitingForActionInput);
             return;
@@ -186,84 +202,90 @@ public class SetTurnActions : MonoBehaviour
 
     void waitForActionInput()
     {
-        if (input.buttonDown(XboxButton.A, player) || Input.GetKeyDown(KeyCode.Alpha1))
+        if (!changed_state_this_frame)
         {
-            action_input_received = PlayerActions.Attack;
-        }
-        else if (input.buttonDown(XboxButton.B, player) || Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            action_input_received = PlayerActions.Ability_1;
-        }
-        else if (input.buttonDown(XboxButton.X, player) || Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            action_input_received = PlayerActions.Ability_2;
-        }
-        else if (input.buttonDown(XboxButton.Y, player) || Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            action_input_received = PlayerActions.Ability_3;
-        }
-        else if (input.buttonDown(XboxButton.RB, player) || Input.GetKeyDown(KeyCode.Alpha5))
-        {
-            action_input_received = PlayerActions.Move;
-        }
+            if (input.buttonDown(XboxButton.A, player) || Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                action_input_received = PlayerActions.Attack;
+            }
+            else if (input.buttonDown(XboxButton.B, player) || Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                action_input_received = PlayerActions.Ability_1;
+            }
+            else if (input.buttonDown(XboxButton.X, player) || Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                action_input_received = PlayerActions.Ability_2;
+            }
+            else if (input.buttonDown(XboxButton.Y, player) || Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                action_input_received = PlayerActions.Ability_3;
+            }
+            else if (input.buttonDown(XboxButton.RB, player) || Input.GetKeyDown(KeyCode.Alpha5))
+            {
+                action_input_received = PlayerActions.Move;
+            }
 
-        if (action_input_received != PlayerActions.None)
-        {
-            setInputState(InputState.WaitingForTargetInput);
+            if (action_input_received != PlayerActions.None)
+            {
+                setInputState(InputState.WaitingForTargetInput);
+            }
         }
     }
 
     void waitForTargetInput()
     {
-        targeter.SetActive(true);
-        targeter.transform.position = target_cols[col_selected].position;
-        if (input.buttonDown(XboxButton.RB, player) || Input.GetKeyDown(KeyCode.RightArrow))
+        if (!changed_state_this_frame)
         {
-            col_selected++;
-            col_selected = (short)Mathf.Min(7, col_selected);
+            targeter.SetActive(true);
             targeter.transform.position = target_cols[col_selected].position;
-            if (action_input_received == PlayerActions.Move)
+            if (input.buttonDown(XboxButton.RB, player) || Input.GetKeyDown(KeyCode.RightArrow))
             {
-                move_dir = player == 0 ? 'f' : 'b';
+                col_selected++;
+                col_selected = (short)Mathf.Min(7, col_selected);
+                targeter.transform.position = target_cols[col_selected].position;
+                if (action_input_received == PlayerActions.Move)
+                {
+                    move_dir = player == 0 ? 'f' : 'b';
+                }
             }
-        }
-        if (input.buttonDown(XboxButton.LB, player) || Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            col_selected--;
-            col_selected = (short)Mathf.Max(0, col_selected);
-            targeter.transform.position = target_cols[col_selected].position;
-            if (action_input_received == PlayerActions.Move)
+            if (input.buttonDown(XboxButton.LB, player) || Input.GetKeyDown(KeyCode.LeftArrow))
             {
-                move_dir = player == 0 ? 'b' : 'f';
+                col_selected--;
+                col_selected = (short)Mathf.Max(0, col_selected);
+                targeter.transform.position = target_cols[col_selected].position;
+                if (action_input_received == PlayerActions.Move)
+                {
+                    move_dir = player == 0 ? 'b' : 'f';
+                }
             }
-        }
-        short team = col_selected < 4 ? (short)0 : (short)1;
-        short unit_x = team == 0 ? (short)(3 - col_selected % 4) : (short)(col_selected % 4);
-        short unit_y = -1;
-        if (input.buttonDown(XboxButton.A, player) || Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            unit_y = 0;
-            target = field.findUnitAtPos(unit_x, unit_y, team);
-        }
-        if (input.buttonDown(XboxButton.B, player) || Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            unit_y = 1;
-            target = field.findUnitAtPos(unit_x, unit_y, team);
-        }
-        if (input.buttonDown(XboxButton.X, player) || Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            unit_y = 2;
-            target = field.findUnitAtPos(unit_x, unit_y, team);
-        }
-        if (input.buttonDown(XboxButton.Y, player) || Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            unit_y = 3;
-            target = field.findUnitAtPos(unit_x, unit_y, team);
-        }
-        if (input.buttonDown(XboxButton.Start, player) || Input.GetKeyDown(KeyCode.Return))
-        {
-            targeter.SetActive(false);
-            setInputState(InputState.ActionAndTargetReceived);
+            short team = col_selected < 4 ? (short)0 : (short)1;
+            short unit_x = team == 0 ? (short)(3 - col_selected % 4) : (short)(col_selected % 4);
+            short unit_y = -1;
+            if (input.buttonDown(XboxButton.A, player) || Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                unit_y = 0;
+                target = field.findUnitAtPos(unit_x, unit_y, team);
+            }
+            if (input.buttonDown(XboxButton.B, player) || Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                unit_y = 1;
+                target = field.findUnitAtPos(unit_x, unit_y, team);
+            }
+            if (input.buttonDown(XboxButton.X, player) || Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                unit_y = 2;
+                target = field.findUnitAtPos(unit_x, unit_y, team);
+            }
+            if (input.buttonDown(XboxButton.Y, player) || Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                unit_y = 3;
+                target = field.findUnitAtPos(unit_x, unit_y, team);
+            }
+            if (input.buttonUp(XboxButton.Start, player) || Input.GetKeyDown(KeyCode.Return))
+            {
+                targeter.SetActive(false);
+                setInputState(InputState.ActionAndTargetReceived);
+            }
         }
     }
 
@@ -280,6 +302,7 @@ public class SetTurnActions : MonoBehaviour
     {
         acting_unit = 0;
         action_queue.Clear();
+        Debug.Log("Setting inputs sent to false for player " + player);
         inputs_sent = false;
         setInputState(InputState.WaitingForActionInput);
         target = null;

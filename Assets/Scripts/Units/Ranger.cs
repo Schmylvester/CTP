@@ -16,12 +16,14 @@ public class Ranger : Unit
 
     protected override void setStats()
     {
-        base_stats[(int)Stat.Accuracy] = 9;
-        base_stats[(int)Stat.Agility] = 5;
-        base_stats[(int)Stat.Attack] = 9;
-        base_stats[(int)Stat.Defence] = 7;
-        base_stats[(int)Stat.Intelligence] = 6;
-        base_stats[(int)Stat.Max_HP] = 5;
-        base_stats[(int)Stat.Speed] = 8;
+        base_stats[(int)Stat.Accuracy] = 90;
+        base_stats[(int)Stat.Agility] = 50;
+        base_stats[(int)Stat.Attack] = 90;
+        base_stats[(int)Stat.Defence] = 70;
+        base_stats[(int)Stat.Intelligence] = 60;
+        base_stats[(int)Stat.Max_HP] = 50;
+        base_stats[(int)Stat.Speed] = 80;
+
+        validateStats(490);
     }
 }

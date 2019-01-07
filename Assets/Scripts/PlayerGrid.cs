@@ -30,9 +30,25 @@ public class PlayerGrid : MonoBehaviour
         return true;
     }
 
-    public void removeUnitFromCol(short col)
+    public void updateGrid()
     {
-        units_in_col[col]--;
+        for(int i = 0; i < units_in_col.Length; i++)
+        {
+            units_in_col[i] = 0;
+        }
+        foreach (Unit u in FindObjectOfType<Field>().getTeam(player).getUnits(true))
+        {
+            addUnitToCol((short)u.grid_pos.x, u);
+        }
+    }
+
+    public bool checkAdd(short col)
+    {
+        if (units_in_col[col] >= columns[col].childCount)
+        {
+            return false;
+        }
+        return true;
     }
 
     public void updateSprites()

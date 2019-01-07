@@ -16,12 +16,14 @@ public class Vampire : Unit
 
     protected override void setStats()
     {
-        base_stats[(int)Stat.Accuracy] = 5;
-        base_stats[(int)Stat.Agility] = 9;
-        base_stats[(int)Stat.Attack] = 7;
-        base_stats[(int)Stat.Defence] = 4;
-        base_stats[(int)Stat.Intelligence] = 8;
-        base_stats[(int)Stat.Max_HP] = 7;
-        base_stats[(int)Stat.Speed] = 9;
+        base_stats[(int)Stat.Accuracy] = 50;
+        base_stats[(int)Stat.Agility] = 90;
+        base_stats[(int)Stat.Attack] = 70;
+        base_stats[(int)Stat.Defence] = 40;
+        base_stats[(int)Stat.Intelligence] = 80;
+        base_stats[(int)Stat.Max_HP] = 70;
+        base_stats[(int)Stat.Speed] = 90;
+
+        validateStats(490);
     }
 }

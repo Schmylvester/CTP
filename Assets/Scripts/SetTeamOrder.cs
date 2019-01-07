@@ -43,7 +43,7 @@ public class SetTeamOrder : MonoBehaviour
     {
         if (grid.addUnitToCol(col, field.getTeam(team).getUnits(false)[selected_unit]))
         {
-            Destroy(selectable_units[selected_unit].gameObject);
+            selectable_units[selected_unit].color = Color.white;
             selected_unit++;
             if (selected_unit < selectable_units.Length)
                 selectable_units[selected_unit].color = new Color(0.4f, 0.7f, 1.0f);
