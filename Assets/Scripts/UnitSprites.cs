@@ -26,6 +26,8 @@ public class UnitSprites : MonoBehaviour {
             idx = 7;
         else if (unit.getName() == "Vampire")
             idx = 8;
+        else if (unit.getName() == "Skeleton")
+            idx = 9;
 
         return units_sprites[idx];
     }

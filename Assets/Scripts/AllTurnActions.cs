@@ -51,7 +51,7 @@ public class AllTurnActions : MonoBehaviour
             }
             else
             {
-                if (a.getTarget() != null)
+                if (a.getTarget().getName() != "invalid")
                 {
                     Debug.Log(u.getName() + " used " + a.ability_name + " on " + a.getTarget().getName());
                 }
@@ -67,7 +67,7 @@ public class AllTurnActions : MonoBehaviour
                 }
             }
 
-            yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(0.025f);
         }
         action_list_combined.Clear();
         players[0].turnOver();

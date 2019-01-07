@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerGrid : MonoBehaviour
 {
+    [SerializeField] short player;
+    [SerializeField] PlayerGrid opponent_grid;
     [SerializeField] UnitSprites sprites;
     [SerializeField] Transform[] columns;
     short[] units_in_col;
@@ -21,19 +23,19 @@ public class PlayerGrid : MonoBehaviour
         {
             return false;
         }
-        short x = -1;
-        if (unit.getTeam().player_id == 0)
-            x = col;
-        else
-            x = (short)(7 - col);
+        short x = col;
         unit.grid_pos = new Vector2Int(x, units_in_col[col]);
         columns[col].GetChild(units_in_col[col]).GetComponent<SpriteRenderer>().sprite = sprites.getSprite(unit);
         units_in_col[col]++;
-        unit.movePosition(col);
         return true;
     }
 
-    public void doneAssigningPositons()
+    public void removeUnitFromCol(short col)
+    {
+        units_in_col[col]--;
+    }
+
+    public void updateSprites()
     {
         for (int i = 0; i < units_in_col.Length; i++)
         {
@@ -42,15 +44,18 @@ public class PlayerGrid : MonoBehaviour
                 columns[i].GetChild(j).GetComponent<SpriteRenderer>().sprite = null;
             }
         }
+        return;
     }
 
     public SpriteRenderer getSprite(Unit unit)
     {
-        int x;
-        if (unit.getTeam().player_id == 0)
-            x = unit.grid_pos.x;
+        if (unit.getTeam().player_id != player)
+        {
+            return opponent_grid.getSprite(unit);
+        }
         else
-            x = (short)(7 - unit.grid_pos.x);
-        return columns[x].GetChild(unit.row).GetComponent<SpriteRenderer>();
+        {
+            return columns[unit.grid_pos.x].GetChild(unit.grid_pos.y).GetComponent<SpriteRenderer>();
+        }
     }
 }

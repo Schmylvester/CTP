@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class Team
 {
-    public int player_id;
+    public short player_id;
     int next_unit_idx = 0;
     int team_size = 5;
     Unit[] units;
     List<SummonedSkeleton> skeletons;
+    PlayerGrid grid;
 
     public Team()
     {
@@ -98,51 +99,17 @@ public class Team
 
     public void addSkeletons(int position)
     {
-        int slots = 4;
-        Unit[] all_units = getUnits(true);
-        for (int i = 0; i < all_units.Length; i++)
+        for(int i = 0; i < 4; i++)
         {
-            if (all_units[i].getPosition() == position)
-                slots--;
-        }
-        for (int i = 0; i < slots; i++)
-        {
-            skeletons.Add(new SummonedSkeleton());
-            skeletons[skeletons.Count - 1].movePosition(position);
-        }
-    }
-
-    public void compressPositions(int num_cols)
-    {
-        short[] col_counts = countUnitsCol(num_cols);
-
-        for (int early_col = 0; early_col < num_cols; early_col++)
-        {
-            for (int populated_col = early_col + 1; populated_col < num_cols; populated_col++)
+            SummonedSkeleton skeleton = new SummonedSkeleton();
+            if (!grid.addUnitToCol((short)position, skeleton))
             {
-                if (col_counts[early_col] == 0 && col_counts[populated_col] != 0)
-                {
-                    foreach (Unit u in units)
-                    {
-                        if (u.getPosition() == populated_col)
-                            u.movePosition(early_col);
-                    }
-                    col_counts = countUnitsCol(num_cols);
-                }
+                skeletons.Add(skeleton);
+            }
+            else
+            {
+                return;
             }
         }
-    }
-
-    short[] countUnitsCol(int num_cols)
-    {
-        short[] col_counts = new short[num_cols];
-        for (int i = 0; i < num_cols; i++)
-            col_counts[i] = 0;
-        foreach (Unit u in units)
-        {
-            if (u.getHealth() > 0)
-                col_counts[u.getPosition()]++;
-        }
-        return col_counts;
     }
 }

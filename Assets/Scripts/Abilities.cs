@@ -178,7 +178,7 @@ namespace Abilities
                 {
                     foreach (Unit unit in t.getUnits(true))
                     {
-                        if (unit.getPosition() == 0)
+                        if (unit.getPos() == 0)
                         {
                             targets.Add(unit);
                         }
@@ -359,7 +359,7 @@ namespace Abilities
         public override void useAbility()
         {
             uses--;
-            target.movePosition(target.getPosition() - 1);
+            target.move('f');
         }
 
         public override bool isHighPriority()
@@ -406,17 +406,11 @@ namespace Abilities
         }
         public override void useAbility()
         {
-            if (direction == 'f')
-                user.movePosition(user.getPosition() - 1);
-            if (direction == 'b')
-                user.movePosition(user.getPosition() + 1);
+            user.move(direction);
         }
         public override bool getRequiredTarget()
         {
-            //is there space, can I move back
-            if (direction == 'f' && user.getPosition() == 0)
-                return false;
-            return (direction == 'f' || direction == 'b');
+            return true;
         }
     }
     public class Perform : Ability
@@ -650,7 +644,7 @@ namespace Abilities
         public override void useAbility()
         {
             uses--;
-            user.getTeam().addSkeletons(user.getPosition());
+            user.getTeam().addSkeletons(user.grid_pos.x);
         }
         public override bool isHighPriority()
         {

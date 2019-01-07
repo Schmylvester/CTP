@@ -51,8 +51,7 @@ public class SetTeamOrder : MonoBehaviour
             {
                 total_set++;
                 units_assigned = true;
-                grid.doneAssigningPositons();
-                field.getTeam(team).compressPositions(4);
+                grid.updateSprites();
             }
         }
     }

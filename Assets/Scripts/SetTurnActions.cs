@@ -52,6 +52,8 @@ public class SetTurnActions : MonoBehaviour
         field = FindObjectOfType<Field>();
         team = field.getTeam(player);
         setInputState(InputState.WaitingForActionInput);
+        foreach (Unit u in team.getUnits(true))
+            u.setGrid(grid);
     }
 
     private void Update()
@@ -79,6 +81,7 @@ public class SetTurnActions : MonoBehaviour
                     else
                     {
                         acting_unit++;
+                        setInputState(InputState.WaitingForActionInput);
                     }
                 }
                 else
@@ -111,8 +114,9 @@ public class SetTurnActions : MonoBehaviour
         }
         if (state == InputState.WaitingForTargetInput)
         {
+            target = null;
             ability_ui.SetActive(false);
-            col_selected = (short)(player * 7);
+            col_selected = (short)((1 - player) * 7);
             targeter.SetActive(true);
             input.clearInputs();
         }
@@ -146,7 +150,7 @@ public class SetTurnActions : MonoBehaviour
                         break;
                 }
             }
-            if (action.ability_name != "invalid" && target != null)
+            if (action.ability_name != "invalid")
             {
                 bool valid = (action.getRequiredTarget() && action.canUse());
                 if (valid)
@@ -205,7 +209,6 @@ public class SetTurnActions : MonoBehaviour
 
     void waitForTargetInput()
     {
-        target = null;
         targeter.SetActive(true);
         targeter.transform.position = target_cols[col_selected].position;
         if (input.buttonDown(XboxButton.RB, player) || Input.GetKeyDown(KeyCode.RightArrow))
@@ -228,21 +231,28 @@ public class SetTurnActions : MonoBehaviour
                 move_dir = player == 0 ? 'b' : 'f';
             }
         }
+        short team = col_selected < 4 ? (short)0 : (short)1;
+        short unit_x = team == 0 ? (short)(3 - col_selected % 4) : (short)(col_selected % 4);
+        short unit_y = -1;
         if (input.buttonDown(XboxButton.A, player) || Input.GetKeyDown(KeyCode.Alpha1))
         {
-            target = field.findUnitAtPos(col_selected, 0);
+            unit_y = 0;
+            target = field.findUnitAtPos(unit_x, unit_y, team);
         }
         if (input.buttonDown(XboxButton.B, player) || Input.GetKeyDown(KeyCode.Alpha2))
         {
-            target = field.findUnitAtPos(col_selected, 1);
+            unit_y = 1;
+            target = field.findUnitAtPos(unit_x, unit_y, team);
         }
         if (input.buttonDown(XboxButton.X, player) || Input.GetKeyDown(KeyCode.Alpha3))
         {
-            target = field.findUnitAtPos(col_selected, 2);
+            unit_y = 2;
+            target = field.findUnitAtPos(unit_x, unit_y, team);
         }
         if (input.buttonDown(XboxButton.Y, player) || Input.GetKeyDown(KeyCode.Alpha4))
         {
-            target = field.findUnitAtPos(col_selected, 3);
+            unit_y = 3;
+            target = field.findUnitAtPos(unit_x, unit_y, team);
         }
         if (input.buttonDown(XboxButton.Start, player) || Input.GetKeyDown(KeyCode.Return))
         {

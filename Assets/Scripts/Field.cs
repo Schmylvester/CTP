@@ -29,15 +29,18 @@ public class Field : MonoBehaviour
             teams[team_id].addUnit(u);
         }
 
-        if(ready_count == 2)
+        if (ready_count == 2)
             UnityEngine.SceneManagement.SceneManager.LoadScene("GameScene");
     }
-    public Unit findUnitAtPos(short x, short y)
+    public Unit findUnitAtPos(short x, short y, short team)
     {
-        foreach (Team t in teams)
-            foreach (Unit u in t.getUnits(true))
-                if (u.grid_pos.x == x & u.grid_pos.y == y)
-                    return u;
+        foreach (Unit u in teams[team].getUnits(true))
+        {
+            if (u.grid_pos.x == x & u.grid_pos.y == y)
+            {
+                return u;
+            }
+        }
 
         return null;
     }

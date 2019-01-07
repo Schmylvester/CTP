@@ -28,8 +28,7 @@ public abstract class Unit : MonoBehaviour
     protected int current_health;
     protected int[] base_stats;
     protected int[] temp_stats;
-    protected int position;
-    public int row;
+    protected PlayerGrid grid;
     public Vector2Int grid_pos;
     protected List<Ability> abilities;
     protected Team team;
@@ -61,6 +60,9 @@ public abstract class Unit : MonoBehaviour
         }
     }
 
+    public void setGrid(PlayerGrid _grid)
+    { grid = _grid; }
+
     public void attack(Unit target, bool distance_penalty = true)
     {
         if (taunted_by != null)
@@ -81,9 +83,9 @@ public abstract class Unit : MonoBehaviour
         if (distance_penalty)
         {
             //for each space I am back, add 20% to the attack miss
-            attack_miss *= Mathf.Pow(1.2f, position);
+            attack_miss *= Mathf.Pow(1.2f, getPos());
             //for each space the target is back, add 60% to the attack miss
-            attack_miss *= Mathf.Pow(1.6f, target.getPosition());
+            attack_miss *= Mathf.Pow(1.6f, target.getPos());
         }
 
         if (Random.Range(0.0f, 1.0f) > attack_miss)
@@ -130,11 +132,6 @@ public abstract class Unit : MonoBehaviour
         return damage_taken;
     }
 
-    public void movePosition(int to)
-    {
-        position = Mathf.Max(to, 0);
-    }
-
     public void advanceTurn()
     {
         resetStats();
@@ -148,11 +145,6 @@ public abstract class Unit : MonoBehaviour
         team = _team;
     }
 
-    public int getPosition()
-    {
-        return position;
-    }
-
     public int getHealth()
     {
         return current_health;
@@ -163,6 +155,8 @@ public abstract class Unit : MonoBehaviour
         current_health += change;
         current_health = Mathf.Min(current_health, getStat(Stat.Max_HP));
         current_health = Mathf.Max(current_health, 0);
+        if (current_health <= 0)
+            die();
     }
 
     public int getStat(Stat stat, bool temp = true)
@@ -267,10 +261,62 @@ public abstract class Unit : MonoBehaviour
                 attack(u);
             }
         }
+
+        Debug.Log(getName() + " died.");
+        grid.getSprite(this).color = Color.red;
     }
 
     public bool getTaunt()
     {
         return taunted_by != null;
+    }
+
+    public void move(char dir)
+    {
+        short target_col = (short)grid_pos.x;
+        if (dir == 'f')
+        {
+            if (grid_pos.x == 7 || grid_pos.x == 3)
+            {
+                Debug.Log("You can't move there you're on the edge or your area.");
+            }
+            else
+            {
+                target_col++;
+            }
+        }
+        else if (dir == 'b')
+        {
+            if (grid_pos.x == 0 || grid_pos.x == 4)
+            {
+                Debug.Log("You can't move there you're on the edge or your area.");
+            }
+            else
+            {
+                target_col--;
+            }
+        }
+        else
+        {
+            Debug.LogError("Error with the direction of the movement");
+            target_col = -1;
+        }
+
+        short pos = (short)grid_pos.x;
+        if (grid.addUnitToCol(target_col, this))
+        {
+            grid.removeUnitFromCol(pos);
+            grid.updateSprites();
+        }
+        else
+        {
+            Debug.Log("That unit can not move there because it is full up.");
+        }
+    }
+
+    public int getPos()
+    {
+        //starting with the row in front, ending when there's a populated row or once the front row is checked
+        return 0;
     }
 }
