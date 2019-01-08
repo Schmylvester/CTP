@@ -143,11 +143,70 @@ public class AllTurnActions : MonoBehaviour
                     best_speed = speed;
                     best_idx = i;
                 }
+                else if (speed == best_speed)
+                {
+                    best_idx = Random.Range(0, 2) == 0 ? best_idx : i;
+                }
             }
             return_list.Add(list[best_idx]);
             list.RemoveAt(best_idx);
         }
 
         return return_list;
+    }
+
+    void addActionsToTracker()
+    {
+        List<Ability> sorted_action_list = new List<Ability>();
+        foreach (Ability a in action_list_combined)
+        {
+            if (a.getUser().getTeam().player_id == 0)
+                sorted_action_list.Add(a);
+        }
+        foreach (Ability a in action_list_combined)
+        {
+            if (a.getUser().getTeam().player_id == 1)
+                sorted_action_list.Add(a);
+        }
+
+        GameTracker tracker = FindObjectOfType<GameTracker>();
+        foreach (Ability a in sorted_action_list)
+        {
+            ActionData data = new ActionData();
+            if (a as Abilities.Attack != null)
+            {
+                data.action_idx = 0;
+            }
+            else if (a as Abilities.Move != null)
+            {
+                data.action_idx = 4;
+                data.target_x = (short)((a as Abilities.Move).direction == 'f' ? 1 : 0);
+                data.target_y = 0;
+                data.target_team = 0;
+            }
+            else
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    if (a.ability_name == a.getUser().getAbility(i).ability_name)
+                    {
+                        data.action_idx = (short)(i + 1);
+                    }
+                }
+            }
+            if (a.noTarget())
+            {
+                data.target_x = 0;
+                data.target_y = 0;
+                data.target_team = 0;
+            }
+            else if (a as Abilities.Move == null)
+            {
+                data.target_x = (short)a.getTarget().grid_pos.x;
+                data.target_y = (short)a.getTarget().grid_pos.y;
+                data.target_team = a.getTarget().getTeam().player_id;
+            }
+            tracker.addAction(data);
+        }
     }
 }

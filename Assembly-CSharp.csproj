@@ -91,6 +91,7 @@
     <Compile Include="Assets\Scripts\DebugField.cs" />
     <Compile Include="Assets\Scripts\Field.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\GameTracker.cs" />
     <Compile Include="Assets\Scripts\GameUnitPopulate.cs" />
     <Compile Include="Assets\Scripts\InputManager.cs" />
     <Compile Include="Assets\Scripts\PlayerGrid.cs" />
@@ -112,14 +113,7 @@
     <Compile Include="Assets\Scripts\Units\Vampire.cs" />
     <Compile Include="Assets\Scripts\UnitSelection.cs" />
     <Compile Include="Assets\Scripts\UnitSprites.cs" />
-    <None Include="Assets\StatFiles\DODGE.txt" />
-    <None Include="Assets\StatFiles\AGILITY.txt" />
-    <None Include="Assets\StatFiles\ATTACK_RANGE.txt" />
-    <None Include="Assets\StatFiles\SIGHT.txt" />
-    <None Include="Assets\StatFiles\INTELLIGENCE.txt" />
-    <None Include="Assets\StatFiles\CHARISMA.txt" />
-    <None Include="Assets\StatFiles\ACCURACY.txt" />
-    <None Include="Assets\StatFiles\MOVE.txt" />
+    <None Include="Assets\Games\18201924941AM.txt" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>D:/CTP/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>

@@ -21,7 +21,7 @@ public class Field : MonoBehaviour
     {
         return teams;
     }
-    public void setTeam(int team_id, Unit[] units)
+    public void setTeam(int team_id, Unit[] units, char[] unit_ids)
     {
         teams[team_id].clearUnits();
         foreach (Unit u in units)

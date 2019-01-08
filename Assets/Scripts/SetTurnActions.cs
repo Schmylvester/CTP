@@ -107,6 +107,7 @@ public class SetTurnActions : MonoBehaviour
             else
             {
                 feedback.printMessage("Game over and team " + (1 + (1 - player)) + " won");
+                FindObjectOfType<GameTracker>().gameEnd();
                 enabled = false;
             }
         }

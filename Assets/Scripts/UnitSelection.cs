@@ -182,7 +182,15 @@ public class UnitSelection : MonoBehaviour
         {
             team[i] = createUnit(units_on_team[i]);
         }
-        unit_manager.setTeam(player_id, team);
+        char[] chars = new char[5]
+        {
+            (char)units_on_team[0],
+            (char)units_on_team[1],
+            (char)units_on_team[2],
+            (char)units_on_team[3],
+            (char)units_on_team[4]
+        };
+        unit_manager.setTeam(player_id, team, chars);
     }
 
     Unit createUnit(int index)
