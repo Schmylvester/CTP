@@ -7,11 +7,11 @@
             ability_name = "Down With the Ship";
             ability_description = "If this unit dies this turn, they attack each of their opponent's units once.";
         }
-        public override void useAbility()
+        public override void useAbility(ActionFeedbackText feedback)
         {
             uses--;
             user.setActiveEffect(SingleTurnEffects.DownWithShip);
-            new ActionFeedbackText().printMessage(user.getName() + " is ready to die.");
+            feedback.printMessage(user.getName() + " is ready to die.");
         }
 
         public override bool isHighPriority()
@@ -19,9 +19,10 @@
             return true;
         }
 
-        public override bool getRequiredTarget()
+
+        protected override TargetRequired targetRequired()
         {
-            return true;
+            return TargetRequired.NoTargetRequired;
         }
     }
 }

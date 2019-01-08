@@ -40,6 +40,7 @@ public class SetTurnActions : MonoBehaviour
     [SerializeField] GameObject ability_ui;
     [SerializeField] Text[] ability_texts;
     [SerializeField] AllTurnActions action_manager;
+    [SerializeField] ActionFeedbackText feedback;
     List<Ability> action_queue;
     Unit target = null;
     char move_dir = '\0';
@@ -89,25 +90,23 @@ public class SetTurnActions : MonoBehaviour
                 }
                 else
                 {
-                    action_manager.addActions(action_queue, swan_active);
                     if (swan_active)
                     {
-                        Debug.Log("I acknowledge that swan is active");
                         swan_active = false;
                         acting_unit = 0;
                         setInputState(InputState.WaitingForActionInput);
                     }
                     else
                     {
-                        Debug.Log("Setting inputs sent to true for player " + player);
                         inputs_sent = true;
                         setInputState(InputState.WaitingForOtherPlayer);
                     }
+                    action_manager.addActions(action_queue, swan_active);
                 }
             }
             else
             {
-                new ActionFeedbackText().printMessage("Game over and team " + (1 + (1 - player)) + " won");
+                feedback.printMessage("Game over and team " + (1 + (1 - player)) + " won");
                 enabled = false;
             }
         }
@@ -178,16 +177,20 @@ public class SetTurnActions : MonoBehaviour
             }
             if (action.ability_name != "invalid")
             {
-                bool valid = (action.getRequiredTarget() && action.canUse());
+                bool valid = (action.targetValid(feedback) && action.canUse());
                 if (valid)
                 {
                     action_queue.Add(action);
                     acting_unit++;
                     grid.getSprite(u).color = Color.white;
                 }
+                else if (!action.targetValid(feedback))
+                {
+                    feedback.printMessage("Player " + (player + 1) + "\nThat target isn't valid for that action", MessageType.Error);
+                }
                 else if (!action.canUse())
                 {
-                    new ActionFeedbackText().printMessage("Hey sorry you ran out of uses for that.", MessageType.Error);
+                    feedback.printMessage("Player " + (player + 1) + "\nHey sorry you ran out of uses for that.", MessageType.Error);
                 }
             }
             else
@@ -295,6 +298,7 @@ public class SetTurnActions : MonoBehaviour
         {
             Ability ability = unit.getAbility(i);
             ability_texts[i].text = ability.ability_name + '\n' + ability.getRemainingUses() + ' ' + ability.ability_description;
+            ability_texts[i].color = ability.getTextColour();
         }
     }
 
@@ -302,7 +306,6 @@ public class SetTurnActions : MonoBehaviour
     {
         acting_unit = 0;
         action_queue.Clear();
-        Debug.Log("Setting inputs sent to false for player " + player);
         inputs_sent = false;
         setInputState(InputState.WaitingForActionInput);
         target = null;

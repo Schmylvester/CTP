@@ -7,20 +7,21 @@
             ability_name = "Berserk";
             ability_description = "User gets an attack buff but can no longer use abilities.";
         }
-        public override void useAbility()
+        public override void useAbility(ActionFeedbackText feedback)
         {
             uses--;
             user.berserk = true;
-            new ActionFeedbackText().printMessage(user.getName() + " is really mad.");
+            feedback.printMessage(user.getName() + " is really mad.");
         }
         public override bool isHighPriority()
         {
             return false;
         }
 
-        public override bool getRequiredTarget()
+
+        protected override TargetRequired targetRequired()
         {
-            return true;
+            return TargetRequired.NoTargetRequired;
         }
     }
 }

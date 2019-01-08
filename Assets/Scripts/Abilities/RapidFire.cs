@@ -7,7 +7,7 @@
             ability_name = "Rapid Fire";
             ability_description = "Attacks each unit on enemy team once with reduced damage.";
         }
-        public override void useAbility()
+        public override void useAbility(ActionFeedbackText feedback)
         {
             user.modifyStat(Stat.Attack, 0.6f);
             foreach (Team t in field.getTeams())
@@ -16,20 +16,21 @@
                 {
                     foreach (Unit u in t.getUnits(true))
                     {
-                        user.attack(u);
+                        user.attack(u, feedback);
                     }
                 }
             }
-            new ActionFeedbackText().printMessage(user.getName() + " attacked everyone on the opposing team.");
+            feedback.printMessage(user.getName() + " attacked everyone on the opposing team.");
         }
 
         public override bool isHighPriority()
         {
             return false;
         }
-        public override bool getRequiredTarget()
+
+        protected override TargetRequired targetRequired()
         {
-            return true;
+            return TargetRequired.NoTargetRequired;
         }
     }
 }

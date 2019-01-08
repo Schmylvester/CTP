@@ -8,18 +8,18 @@ namespace Abilities
             ability_name = "Charm";
             ability_description = "May prevent target from performing action this turn";
         }
-        public override void useAbility()
+        public override void useAbility(ActionFeedbackText feedback)
         {
             uses--;
             float chance = Mathf.Pow(0.9f, (target.getStat(Stat.Defence) + target.getStat(Stat.Intelligence) / 2));
             if (Random.Range(0.0f, 1.0f) < chance)
             {
                 target.setActiveEffect(SingleTurnEffects.Charmed);
-                new ActionFeedbackText().printMessage(user.getName() + " has charmed " + target.getName());
+                feedback.printMessage(user.getName() + " has charmed " + target.getName());
             }
             else
             {
-                new ActionFeedbackText().printMessage(user.getName() + " tried to put the moves on " + target.getName() + " but they weren't into it.");
+                feedback.printMessage(user.getName() + " tried to put the moves on " + target.getName() + " but they weren't into it.");
             }
         }
 
@@ -27,9 +27,10 @@ namespace Abilities
         {
             return true;
         }
-        public override bool getRequiredTarget()
+
+        protected override TargetRequired targetRequired()
         {
-            return user.getTeam() != target.getTeam() && target.getHealth() > 0;
+            return TargetRequired.AnyLivingEnemy;
         }
     }
 }

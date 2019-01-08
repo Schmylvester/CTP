@@ -7,11 +7,11 @@
             ability_name = "Body Block";
             ability_description = "If target is attacked this turn, the user takes the attack instead.";
         }
-        public override void useAbility()
+        public override void useAbility(ActionFeedbackText feedback)
         {
             uses--;
             target.defended_by = user;
-            new ActionFeedbackText().printMessage(user.getName() + " is standing in front of " + target.getName());
+            feedback.printMessage(user.getName() + " is standing in front of " + target.getName());
         }
 
         public override bool isHighPriority()
@@ -19,11 +19,10 @@
             return true;
         }
 
-        public override bool getRequiredTarget()
+
+        protected override TargetRequired targetRequired()
         {
-            if (user == target)
-                return false;
-            return user.getTeam() == target.getTeam() && target.getHealth() > 0;
+            return TargetRequired.AnyOtherLivingAlly;
         }
     }
 }

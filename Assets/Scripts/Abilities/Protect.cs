@@ -7,23 +7,22 @@
             ability_name = "Protect";
             ability_description = "Target's defence is buffed for this turn.";
         }
-        public override void useAbility()
+        public override void useAbility(ActionFeedbackText feedback)
         {
             uses--;
-            int phys_mod = UnityEngine.Mathf.Max(user.getStat(Stat.Defence) / 2, 1);
+            int phys_mod = UnityEngine.Mathf.Max(user.getStat(Stat.Defence) / 2, 30);
             target.modifyStat(Stat.Defence, phys_mod);
-            new ActionFeedbackText().printMessage(user.getName() + " is protecting " + target.getName());
+            feedback.printMessage(user.getName() + " is protecting " + target.getName());
         }
 
         public override bool isHighPriority()
         {
             return true;
         }
-        public override bool getRequiredTarget()
+
+        protected override TargetRequired targetRequired()
         {
-            if (user == target)
-                return false;
-            return target.getTeam() == user.getTeam() && target.getHealth() > 0;
+            return TargetRequired.AnyOtherLivingAlly;
         }
     }
 }

@@ -8,7 +8,7 @@
             ability_name = "Soul Harvest";
             ability_description = "User recovers health for each dead unit in play.";
         }
-        public override void useAbility()
+        public override void useAbility(ActionFeedbackText feedback)
         {
             uses--;
             int count = 0;
@@ -18,17 +18,18 @@
             }
             float heal_amount = user.getStat(Stat.Max_HP) / 10;
             heal_amount *= count;
-            user.changeHealth((int)heal_amount);
-            new ActionFeedbackText().printMessage(user.getName() + " absorbs " + heal_amount + " health from the dead.");
+            user.changeHealth((int)heal_amount, feedback);
+            feedback.printMessage(user.getName() + " absorbs " + heal_amount + " health from the dead.");
         }
         public override bool isHighPriority()
         {
             return false;
         }
 
-        public override bool getRequiredTarget()
+
+        protected override TargetRequired targetRequired()
         {
-            return true;
+            return TargetRequired.NoTargetRequired;
         }
     }
 }

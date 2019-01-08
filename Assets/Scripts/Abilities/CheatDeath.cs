@@ -7,11 +7,11 @@
             ability_name = "Cheat Death";
             ability_description = "If the user dies this turn, there's an 80% chance that they will come back to life.";
         }
-        public override void useAbility()
+        public override void useAbility(ActionFeedbackText feedback)
         {
             uses--;
             user.setActiveEffect(SingleTurnEffects.CheatingDeath);
-            new ActionFeedbackText().printMessage(user.getName() + " is seeking immortality.");
+            feedback.printMessage(user.getName() + " is seeking immortality.");
         }
 
         public override bool isHighPriority()
@@ -19,9 +19,10 @@
             return true;
         }
 
-        public override bool getRequiredTarget()
+
+        protected override TargetRequired targetRequired()
         {
-            return true;
+            return TargetRequired.NoTargetRequired;
         }
     }
 }

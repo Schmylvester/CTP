@@ -19,6 +19,7 @@ public class AllTurnActions : MonoBehaviour
     InputManager input;
     bool input_received = false;
     [SerializeField] PlayerGrid[] grids;
+    [SerializeField] ActionFeedbackText feedback_text;
 
     private void Start()
     {
@@ -45,6 +46,7 @@ public class AllTurnActions : MonoBehaviour
 
     IEnumerator triggerActions()
     {
+        feedback_text.setCount(action_list_combined.Count);
         foreach (Ability a in action_list_combined)
         {
             if (speed == Speed.Wait_For_Input)
@@ -53,7 +55,7 @@ public class AllTurnActions : MonoBehaviour
             }
             Unit u = a.getUser();
             Unit t = a.getTarget();
-            if (a as Abilities.Move != null || t == null)
+            if (a as Abilities.Move != null || t == null || a.noTarget())
                 t = u;
 
             SpriteRenderer user_sprite = grids[u.getTeam().player_id].getSprite(u);
@@ -65,25 +67,25 @@ public class AllTurnActions : MonoBehaviour
                 target_sprite.color = new Color(1.0f, 1.0f, 0.6f);
 
             if (u.getHealth() <= 0)
-                new ActionFeedbackText().printMessage("The " + u.getName() + " is dead, so we'll skip their action for now.");
+                feedback_text.printMessage("The " + u.getName() + " is dead, so we'll skip their action for now.");
             else if (t.getHealth() <= 0 && (a as Abilities.Revive) == null)
-                new ActionFeedbackText().printMessage(u.getName() + " wanted to do something to " + t.getName() + " but " + t.getName() + " is dead now so maybe not.");
+                feedback_text.printMessage(u.getName() + " wanted to do something to " + t.getName() + " but " + t.getName() + " is dead now so maybe not.");
             else if (u.getEffectActive(SingleTurnEffects.Charmed))
             {
-                new ActionFeedbackText().printMessage(u.getName() + " is under a charm, so won't do anything.");
+                feedback_text.printMessage(u.getName() + " is under a charm, so they won't do anything.");
             }
             else if (u.getTaunt())
             {
-                new ActionFeedbackText().printMessage(u.getName() + " was taunted.");
-                u.attack(null);
+                feedback_text.printMessage(u.getName() + " was taunted.");
+                u.attack(null, feedback_text);
             }
             else
             {
-                a.useAbility();
+                a.useAbility(feedback_text);
                 if ((a as Abilities.Attack) != null && u.getEffectActive(SingleTurnEffects.Ambushed))
                 {
                     u.modifyStat(Stat.Attack, 0.3f);
-                    u.attack(u);
+                    u.attack(u, feedback_text);
                 }
             }
 
@@ -96,10 +98,11 @@ public class AllTurnActions : MonoBehaviour
             user_sprite.color = u_c_before;
             target_sprite.color = t_c_before;
         }
+        yield return new WaitForSeconds(1.0f);
         action_list_combined.Clear();
         players[0].turnOver();
         players[1].turnOver();
-        yield return new WaitForSeconds(1.0f);
+        feedback_text.clear();
         yield return null;
     }
 

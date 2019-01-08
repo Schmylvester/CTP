@@ -26,17 +26,18 @@ public class UnitSelection : MonoBehaviour
 
     private void Awake()
     {
-        unit_list = new List<Unit>();
+        unit_list = new List<Unit>() {
+            new Bard(),
+            new Cleric(),
+            new Knight(),
+            new Necromancer(),
+            new Paladin(),
+            new Pirate(),
+            new Ranger(),
+            new Rogue(),
+            new Vampire()
+        };
 
-        unit_list.Add(new Bard());
-        unit_list.Add(new Cleric());
-        unit_list.Add(new Knight());
-        unit_list.Add(new Necromancer());
-        unit_list.Add(new Paladin());
-        unit_list.Add(new Pirate());
-        unit_list.Add(new Ranger());
-        unit_list.Add(new Rogue());
-        unit_list.Add(new Vampire());
         changeSelection(0);
 
         units_on_team = new List<int>();
@@ -179,8 +180,36 @@ public class UnitSelection : MonoBehaviour
         Unit[] team = new Unit[units_on_team.Count];
         for (int i = 0; i < units_on_team.Count; i++)
         {
-            team[i] = unit_list[units_on_team[i]];
+            team[i] = createUnit(units_on_team[i]);
         }
         unit_manager.setTeam(player_id, team);
+    }
+
+    Unit createUnit(int index)
+    {
+        switch (index)
+        {
+            case 0:
+                return (new Bard());
+            case 1:
+                return (new Cleric());
+            case 2:
+                return (new Knight());
+            case 3:
+                return (new Necromancer());
+            case 4:
+                return (new Paladin());
+            case 5:
+                return (new Pirate());
+            case 6:
+                return (new Ranger());
+            case 7:
+                return (new Rogue());
+            case 8:
+                return (new Vampire());
+            default:
+                Debug.LogError("HeyBroken");
+                return new Bard();
+        }
     }
 }

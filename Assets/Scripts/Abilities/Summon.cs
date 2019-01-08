@@ -7,19 +7,19 @@
             ability_name = "Raise Dead";
             ability_description = "Summons some skeletons to fight alongside you.";
         }
-        public override void useAbility()
+        public override void useAbility(ActionFeedbackText feedback)
         {
             uses--;
             int summoned = user.getTeam().addSkeletons(user.grid_pos.x);
-            new ActionFeedbackText().printMessage(user.getName() + " summons " + summoned + " skeletons.");
+            feedback.printMessage(user.getName() + " summons " + summoned + " skeletons.");
         }
         public override bool isHighPriority()
         {
             return false;
         }
-        public override bool getRequiredTarget()
+        protected override TargetRequired targetRequired()
         {
-            return true;
+            return TargetRequired.NoTargetRequired;
         }
     }
 }

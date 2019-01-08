@@ -7,7 +7,7 @@
             ability_name = "Dedicated Performance";
             ability_description = "Target has their stats improved significantly";
         }
-        public override void useAbility()
+        public override void useAbility(ActionFeedbackText feedback)
         {
             uses--;
             //start at 1 so it doesn't change max health
@@ -15,7 +15,7 @@
             {
                 target.changeStat((Stat)i, 1.4f);
             }
-            new ActionFeedbackText().printMessage(user.getName() + " is singing " + target.getName() + " a lovely song.");
+            feedback.printMessage(user.getName() + " is singing " + target.getName() + " a lovely song.");
         }
 
         public override bool isHighPriority()
@@ -23,11 +23,10 @@
             return true;
         }
 
-        public override bool getRequiredTarget()
+
+        protected override TargetRequired targetRequired()
         {
-            if (user == target)
-                return false;
-            return user.getTeam() == target.getTeam() && target.getHealth() > 0;
+            return TargetRequired.AnyOtherLivingAlly;
         }
     }
 }

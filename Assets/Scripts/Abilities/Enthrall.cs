@@ -8,20 +8,21 @@
             ability_name = "Enthrall";
             ability_description = "Moves the target forward one position";
         }
-        public override void useAbility()
+        public override void useAbility(ActionFeedbackText feedback)
         {
             uses--;
-            target.move('f');
-            new ActionFeedbackText().printMessage(user.getName() + " made " + target.getName() + " walk forwards.");
+            target.move('f', feedback);
+            feedback.printMessage(user.getName() + " made " + target.getName() + " walk forwards.");
         }
 
         public override bool isHighPriority()
         {
             return false;
         }
-        public override bool getRequiredTarget()
+
+        protected override TargetRequired targetRequired()
         {
-            return user.getTeam() != target.getTeam() && target.getHealth() > 0;
+            return TargetRequired.AnythingButSelf;
         }
     }
 }

@@ -68,14 +68,14 @@ public abstract class Unit
             abilities[i].setField(field);
     }
 
-    public int attack(Unit target, bool distance_penalty = true)
+    public int attack(Unit target, ActionFeedbackText feedback, bool distance_penalty = true)
     {
         if (taunted_by != null)
         {
             resetStats();
             target = taunted_by;
             taunted_by = null;
-            return attack(target);
+            return attack(target, feedback);
         }
 
         float attack_miss = 0.6f;
@@ -105,21 +105,21 @@ public abstract class Unit
             {
                 base_damage += Random.Range(2, 5);
             }
-            int dam = target.takeDamage(base_damage);
+            int dam = target.takeDamage(base_damage, feedback);
             return dam;
         }
         else
-            new ActionFeedbackText().printMessage(getName() + "'s attack had a " + ((int)((1 - attack_miss) * 100)).ToString() + "% chance of hitting " + target.getName() + " but it missed.");
+            feedback.printMessage(getName() + "'s attack had a " + ((int)((1 - attack_miss) * 100)).ToString() + "% chance of hitting " + target.getName() + " but it missed.");
         return 0;
     }
 
 
-    public int takeDamage(int damage)
+    public int takeDamage(int damage, ActionFeedbackText feedback)
     {
         if (defended_by != null)
         {
-            new ActionFeedbackText().printMessage("Attack blocked by " + defended_by.getName());
-            return defended_by.takeDamage(damage);
+            feedback.printMessage("Attack blocked by " + defended_by.getName());
+            return defended_by.takeDamage(damage, feedback);
         }
         if ((this as Rogue) != null)
             (this as Rogue).sneak_turns = 0;
@@ -130,10 +130,10 @@ public abstract class Unit
         }
         //if the attack hits, at least 15 damage
         damage_taken = Mathf.Max(15, damage_taken);
-        changeHealth(-damage_taken);
+        changeHealth(-damage_taken, feedback);
         if (current_health <= 0)
         {
-            die();
+            die(feedback);
         }
         return damage_taken;
     }
@@ -156,7 +156,7 @@ public abstract class Unit
         return current_health;
     }
 
-    public int changeHealth(int change)
+    public int changeHealth(int change, ActionFeedbackText feedback)
     {
         if (current_health == 0)
         {
@@ -168,7 +168,7 @@ public abstract class Unit
         current_health = Mathf.Min(current_health, getStat(Stat.Max_HP));
         current_health = Mathf.Max(current_health, 0);
         if (current_health <= 0)
-            die();
+            die(feedback);
         return current_health - start_health;
     }
 
@@ -183,22 +183,20 @@ public abstract class Unit
         base_stats[(int)stat] = (int)(base_stats[(int)stat] * change);
         resetStat(stat);
     }
-
-    //public void changeStat(Stat stat, int change)
-    //{
-    //    base_stats[(int)stat] += change;
-    //    resetStat(stat);
-    //}
+    public void changeStat(Stat stat, int change)
+    {
+        base_stats[(int)stat] += change;
+        resetStat(stat);
+    }
 
     public void modifyStat(Stat stat, float mod)
     {
-        temp_stats[(int)stat] = (int)(temp_stats[(int)stat] * mod);
+        temp_stats[(int)stat] *= (int)(temp_stats[(int)stat] * mod);
     }
-
-    //public void modifyStat(Stat stat, int mod)
-    //{
-    //    temp_stats[(int)stat] += mod;
-    //}
+    public void modifyStat(Stat stat, int mod)
+    {
+        temp_stats[(int)stat] += mod;
+    }
 
     protected void resetStat(Stat stat)
     {
@@ -255,33 +253,33 @@ public abstract class Unit
         return true;
     }
 
-    public virtual void die()
+    public virtual void die(ActionFeedbackText feedback)
     {
         if (getEffectActive(SingleTurnEffects.CheatingDeath))
         {
             if (Random.Range(0.0f, 1.0f) < 0.8f)
             {
-                new ActionFeedbackText().printMessage(getName() + " cheated death.");
+               feedback.printMessage(getName() + " cheated death.");
                 current_health = 1;
                 return;
             }
         }
         if (getEffectActive(SingleTurnEffects.DownWithShip))
         {
-            new ActionFeedbackText().printMessage(getName() + " is taking you with them.");
+            feedback.printMessage(getName() + " is taking you with them.");
             foreach (Unit u in field.getTeam(1 - team.player_id).getUnits(true))
             {
-                attack(u);
+                attack(u, feedback);
             }
         }
 
         if (getEffectActive(SingleTurnEffects.SwanSong))
         {
-            new ActionFeedbackText().printMessage(getName() + " was singing a really nice song, so now their team all get two actions next turn.");
+            feedback.printMessage(getName() + " was singing a really nice song, so now their team all get two actions next turn.");
             actions.swan_active = true;
         }
 
-        new ActionFeedbackText().printMessage(getName() + " died.");
+        feedback.printMessage(getName() + " died.");
 
         grid.getSprite(this).color = Color.white - new Color(0, 0, 0, 0.5f);
         grid.getSprite(this).flipY = true;
@@ -292,14 +290,14 @@ public abstract class Unit
         return taunted_by != null;
     }
 
-    public bool moveValid(char dir)
+    public bool moveValid(char dir, ActionFeedbackText feedback)
     {
         short target_col = (short)grid_pos.x;
         if (dir == 'f')
         {
             if (grid_pos.x == 0)
             {
-                new ActionFeedbackText().printMessage("You can't move into the enemy zone.", MessageType.Error);
+                feedback.printMessage("Player " + (team.player_id + 1) + "\nYou can't move into the enemy zone.", MessageType.Error);
                 return false;
             }
             else
@@ -311,7 +309,7 @@ public abstract class Unit
         {
             if (grid_pos.x == 3)
             {
-                new ActionFeedbackText().printMessage("You can't move off the grid.", MessageType.Error);
+                feedback.printMessage("Player " + (team.player_id + 1) + "\nYou can't move off the grid.", MessageType.Error);
                 return false;
             }
             else
@@ -332,12 +330,12 @@ public abstract class Unit
         }
         else
         {
-            new ActionFeedbackText().printMessage("That unit can not move there because it is full up.", MessageType.Error);
+            feedback.printMessage("Player " + (team.player_id + 1) + "\nThat unit can not move there because it is full up.", MessageType.Error);
             return false;
         }
     }
 
-    public void move(char dir)
+    public void move(char dir, ActionFeedbackText feedback)
     {
         short target_col = (short)grid_pos.x;
         if (dir == 'f')
@@ -356,16 +354,16 @@ public abstract class Unit
         }
         else
         {
-            new ActionFeedbackText().printMessage("At the start of the turn, " + getName() + " wanted to move, and they could, but now they can not.");
+            feedback.printMessage("At the start of the turn, " + getName() + " wanted to move, and they could, but now they can not.");
         }
     }
 
     public int getPos()
     {
         int pos = grid_pos.x;
-        for(short i = (short)grid_pos.x; i >= 0; i--)
+        for (short i = (short)grid_pos.x; i >= 0; i--)
         {
-            if(team.colEmpty(i))
+            if (team.colEmpty(i))
             {
                 pos--;
             }

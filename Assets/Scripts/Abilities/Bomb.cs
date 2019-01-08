@@ -7,7 +7,7 @@
             ability_name = "Bomb";
             ability_description = "Damages opponent's entire front row and this unit.";
         }
-        public override void useAbility()
+        public override void useAbility(ActionFeedbackText feedback)
         {
             uses--;
             System.Collections.Generic.List<Unit> targets = new System.Collections.Generic.List<Unit>();
@@ -29,17 +29,19 @@
 
             foreach (Unit t in targets)
             {
-                t.takeDamage(UnityEngine.Random.Range(1, user.getStat(Stat.Attack) + 3));
+                t.takeDamage(UnityEngine.Random.Range(1, user.getStat(Stat.Attack) + 3), feedback);
             }
+            feedback.printMessage(user.getName() + " damaged a bunch of people with a bomb.");
         }
 
         public override bool isHighPriority()
         {
             return false;
         }
-        public override bool getRequiredTarget()
+
+        protected override TargetRequired targetRequired()
         {
-            return true;
+            return TargetRequired.NoTargetRequired;
         }
     }
 }

@@ -1,5 +1,16 @@
 ﻿using UnityEngine;
 
+public enum TargetRequired
+{
+    AnyLivingEnemy,
+    AnyLivingAlly,
+    AnyOtherLivingAlly,
+    AnyDeadAlly,
+    AnythingButSelf,
+    Direction,
+    NoTargetRequired,
+}
+
 public abstract class Ability
 {
     protected Field field;
@@ -11,8 +22,14 @@ public abstract class Ability
     protected int max_uses = 5;
 
     public abstract bool isHighPriority();
-    public abstract void useAbility();
-    public abstract bool getRequiredTarget();
+    public abstract void useAbility(ActionFeedbackText feedback);
+    protected abstract TargetRequired targetRequired();
+
+    public bool noTarget()
+    {
+        return targetRequired() == TargetRequired.NoTargetRequired;
+    }
+
     public Unit getUser()
     {
         return user;
@@ -45,6 +62,58 @@ public abstract class Ability
     {
         field = _field;
     }
+
+    public bool targetValid(ActionFeedbackText feedback)
+    {
+        TargetRequired required = targetRequired();
+        if (required != TargetRequired.NoTargetRequired && required != TargetRequired.Direction && target == null)
+        {
+            return false;
+        }
+        switch (required)
+        {
+            case TargetRequired.Direction:
+                return user.moveValid((this as Abilities.Move).direction, feedback);
+            case TargetRequired.AnythingButSelf:
+                return target != user && target.getHealth() > 0;
+            case TargetRequired.AnyLivingAlly:
+                return target.getTeam() == user.getTeam() && target.getHealth() > 0;
+            case TargetRequired.AnyDeadAlly:
+                return target.getTeam() == user.getTeam() && target.getHealth() <= 0;
+            case TargetRequired.AnyLivingEnemy:
+                return target.getTeam() != user.getTeam() && target.getHealth() > 0;
+            case TargetRequired.AnyOtherLivingAlly:
+                return target.getTeam() == user.getTeam() && target.getHealth() > 0 && user != target;
+            case TargetRequired.NoTargetRequired:
+                return true;
+            default:
+                Debug.LogError("There is a target requirement type not checked in get valid target");
+                return false;
+        }
+    }
+
+    public Color getTextColour()
+    {
+        switch (targetRequired())
+        {
+            case TargetRequired.AnyLivingEnemy:
+                return Color.red * Color.gray;
+            case TargetRequired.AnyLivingAlly:
+                return Color.cyan * Color.gray;
+            case TargetRequired.AnyOtherLivingAlly:
+                return Color.green * Color.gray;
+            case TargetRequired.AnyDeadAlly:
+                return Color.yellow * Color.gray;
+            case TargetRequired.AnythingButSelf:
+                return Color.magenta * Color.gray;
+            case TargetRequired.Direction:
+                return Color.black;
+            case TargetRequired.NoTargetRequired:
+                return Color.blue * Color.gray;
+            default:
+                return Color.black;
+        }
+    }
 }
 namespace Abilities
 {
@@ -54,13 +123,13 @@ namespace Abilities
         {
             ability_name = "Attack";
         }
-        public override void useAbility()
+        public override void useAbility(ActionFeedbackText feedback)
         {
-            int dam = user.attack(target);
-            if(user == target)
-                new ActionFeedbackText().printMessage(user.getName() + " was caught in an ambush and took " + dam + " damage.");
+            int dam = user.attack(target, feedback);
+            if (user == target)
+                feedback.printMessage(user.getName() + " was caught in an ambush and took " + dam + " damage.");
             else if (dam > 0)
-                new ActionFeedbackText().printMessage(user.getName() + " attacked " + target.getName() + " for " + dam + " damage.");
+                feedback.printMessage(user.getName() + " attacked " + target.getName() + " for " + dam + " damage.");
         }
 
         public override bool isHighPriority()
@@ -68,12 +137,9 @@ namespace Abilities
             return false;
         }
 
-
-        public override bool getRequiredTarget()
+        protected override TargetRequired targetRequired()
         {
-            if (target == null)
-                return false;
-            return user.getTeam() != target.getTeam() && target.getHealth() > 0;
+            return TargetRequired.AnyLivingEnemy;
         }
     }
     public class Move : Ability
@@ -87,17 +153,18 @@ namespace Abilities
         {
             return false;
         }
-        public override void useAbility()
+        public override void useAbility(ActionFeedbackText feedback)
         {
-            user.move(direction);
+            user.move(direction, feedback);
             if (direction == 'b')
-                new ActionFeedbackText().printMessage(user.getName() + " moved away from the enemy.");
+                feedback.printMessage(user.getName() + " moved away from the enemy.");
             if (direction == 'f')
-                new ActionFeedbackText().printMessage(user.getName() + " moved towards the enemy.");
+                feedback.printMessage(user.getName() + " moved towards the enemy.");
         }
-        public override bool getRequiredTarget()
+
+        protected override TargetRequired targetRequired()
         {
-            return user.moveValid(direction);
+            return TargetRequired.Direction;
         }
     }
 }

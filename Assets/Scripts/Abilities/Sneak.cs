@@ -9,7 +9,7 @@ namespace Abilities
             ability_name = "Sneak";
             ability_description = "Increases user's evasion this turn, user's next attack is buffed proportional to the number of consecutive times this move has been used without being hit.";
         }
-        public override void useAbility()
+        public override void useAbility(ActionFeedbackText feedback)
         {
             uses--;
             if ((user as Rogue) != null)
@@ -21,7 +21,7 @@ namespace Abilities
                 Debug.LogError("Sneak is not implemented for that unit, and should not be useable.");
             }
             user.modifyStat(Stat.Agility, 1.5f);
-            new ActionFeedbackText().printMessage(user.getName() + " is sneaking around.");
+            feedback.printMessage(user.getName() + " is sneaking around.");
         }
 
         public override bool isHighPriority()
@@ -29,9 +29,10 @@ namespace Abilities
             return true;
         }
 
-        public override bool getRequiredTarget()
+
+        protected override TargetRequired targetRequired()
         {
-            return true;
+            return TargetRequired.NoTargetRequired;
         }
     }
 }
