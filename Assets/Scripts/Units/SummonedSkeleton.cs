@@ -10,14 +10,14 @@
 
     protected override void setStats()
     {
-        base_stats[(int)Stat.Accuracy] = 50;
-        base_stats[(int)Stat.Agility] = 20;
-        base_stats[(int)Stat.Attack] = 50;
-        base_stats[(int)Stat.Defence] = 50;
+        base_stats[(int)Stat.Accuracy] = 90;
+        base_stats[(int)Stat.Agility] = 0;
+        base_stats[(int)Stat.Attack] = 70;
+        base_stats[(int)Stat.Defence] = 0;
         base_stats[(int)Stat.Intelligence] = 0;
-        base_stats[(int)Stat.Max_HP] = -50;
-        base_stats[(int)Stat.Speed] = 70;
+        base_stats[(int)Stat.Max_HP] = -90;
+        base_stats[(int)Stat.Speed] = 0;
 
-        validateStats(190);
+        //validateStats(190);
     }
 }

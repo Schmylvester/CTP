@@ -46,6 +46,7 @@ public class AllTurnActions : MonoBehaviour
 
     IEnumerator triggerActions()
     {
+        addActionsToTracker();
         feedback_text.setCount(action_list_combined.Count);
         foreach (Ability a in action_list_combined)
         {

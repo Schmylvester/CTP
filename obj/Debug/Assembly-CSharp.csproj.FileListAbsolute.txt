@@ -420,7 +420,6 @@ D:\CTP\Temp\bin\Debug\UnityEngine.WindModule.dll
 D:\CTP\Temp\bin\Debug\UnityEngine.XRModule.dll
 D:\CTP\Temp\bin\Debug\UnityScript.dll
 D:\CTP\Temp\bin\Debug\UnityScript.Lang.dll
-D:\CTP\Temp\bin\Debug\Vuforia.UnityExtensions.dll
 D:\CTP\Temp\bin\Debug\UnityEngine.ParticlesLegacyModule.dll
 D:\CTP\Temp\bin\Debug\Unity.Cecil.dll
 D:\CTP\Temp\bin\Debug\Unity.SerializationLogic.dll
@@ -496,7 +495,6 @@ D:\CTP\Temp\bin\Debug\UnityEngine.XRModule.xml
 D:\CTP\Temp\bin\Debug\UnityEngine.UI.xml
 D:\CTP\Temp\bin\Debug\UnityEngine.Timeline.xml
 D:\CTP\Temp\bin\Debug\UnityEngine.Networking.xml
-D:\CTP\Temp\bin\Debug\Vuforia.UnityExtensions.xml
 D:\CTP\Temp\bin\Debug\UnityEngine.GoogleAudioSpatializer.xml
 D:\CTP\Temp\bin\Debug\UnityEngine.HoloLens.xml
 D:\CTP\Temp\bin\Debug\UnityEngine.SpatialTracking.xml

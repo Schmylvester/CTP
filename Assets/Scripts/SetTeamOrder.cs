@@ -41,8 +41,10 @@ public class SetTeamOrder : MonoBehaviour
 
     void assignUnit(short col)
     {
-        if (grid.addUnitToCol(col, field.getTeam(team).getUnits(false)[selected_unit]))
+        Unit unit = field.getTeam(team).getUnits(false)[selected_unit];
+        if (grid.addUnitToCol(col, unit))
         {
+            FindObjectOfType<GameTracker>().addUnit(unit);
             selectable_units[selected_unit].color = Color.white;
             selected_unit++;
             if (selected_unit < selectable_units.Length)

@@ -121,7 +121,8 @@ public class SetTurnActions : MonoBehaviour
         {
             if (acting_unit < team.getUnits(true).Length)
             {
-                if (team.getUnits(true)[acting_unit].getName() == "Skeleton")
+                Unit unit = team.getUnits(true)[acting_unit];
+                if (unit.getName() == "Skeleton" || unit.berserk)
                 {
                     setInputState(InputState.WaitingForTargetInput);
                     action_input_received = PlayerActions.Attack;
@@ -150,31 +151,24 @@ public class SetTurnActions : MonoBehaviour
         {
             targeter.SetActive(false);
             Unit u = team.getUnits(true)[acting_unit];
-            if (u.berserk)
+            switch (action_input_received)
             {
-                action_input_received = PlayerActions.Attack;
-            }
-            else
-            {
-                switch (action_input_received)
-                {
-                    case PlayerActions.Attack:
-                        action = new Attack();
-                        action.setUser(u);
-                        action.setTarget(target);
-                        break;
-                    case PlayerActions.Ability_1:
-                    case PlayerActions.Ability_2:
-                    case PlayerActions.Ability_3:
-                        action = u.getAbility((int)action_input_received);
-                        action.setTarget(target);
-                        break;
-                    case PlayerActions.Move:
-                        action = new Move();
-                        action.setUser(u);
-                        (action as Move).direction = move_dir;
-                        break;
-                }
+                case PlayerActions.Attack:
+                    action = new Attack();
+                    action.setUser(u);
+                    action.setTarget(target);
+                    break;
+                case PlayerActions.Ability_1:
+                case PlayerActions.Ability_2:
+                case PlayerActions.Ability_3:
+                    action = u.getAbility((int)action_input_received);
+                    action.setTarget(target);
+                    break;
+                case PlayerActions.Move:
+                    action = new Move();
+                    action.setUser(u);
+                    (action as Move).direction = move_dir;
+                    break;
             }
             if (action.ability_name != "invalid")
             {

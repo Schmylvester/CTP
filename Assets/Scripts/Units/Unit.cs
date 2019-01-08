@@ -191,7 +191,7 @@ public abstract class Unit
 
     public void modifyStat(Stat stat, float mod)
     {
-        temp_stats[(int)stat] *= (int)(temp_stats[(int)stat] * mod);
+        temp_stats[(int)stat] = (int)(temp_stats[(int)stat] * mod);
     }
     public void modifyStat(Stat stat, int mod)
     {
@@ -280,9 +280,12 @@ public abstract class Unit
         }
 
         feedback.printMessage(getName() + " died.");
-
         grid.getSprite(this).color = Color.white - new Color(0, 0, 0, 0.5f);
         grid.getSprite(this).flipY = true;
+        if(getName() == "Skeleton" && Random.Range(0,2) == 0)
+        {
+            team.removeSkeleton((SummonedSkeleton)this);
+        }
     }
 
     public bool getTaunt()

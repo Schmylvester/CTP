@@ -126,14 +126,19 @@ public class Team
         return skeletons_summoned;
     }
 
+    public void removeSkeleton(SummonedSkeleton skeleton)
+    {
+        skeletons.Remove(skeleton);
+        grid.updateGrid();
+    }
+
     public bool colEmpty(short col)
     {
-        short i = 0;
-        foreach(Unit u in units)
+        foreach (Unit u in units)
         {
-            if (u.grid_pos.x == col)
-                i++;
+            if (u.grid_pos.x == col && u.getHealth() > 0)
+                return false;
         }
-        return i == 0;
+        return true;
     }
 }

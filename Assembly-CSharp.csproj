@@ -113,7 +113,6 @@
     <Compile Include="Assets\Scripts\Units\Vampire.cs" />
     <Compile Include="Assets\Scripts\UnitSelection.cs" />
     <Compile Include="Assets\Scripts\UnitSprites.cs" />
-    <None Include="Assets\Games\18201924941AM.txt" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>D:/CTP/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>

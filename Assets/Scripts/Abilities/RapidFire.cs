@@ -9,6 +9,7 @@
         }
         public override void useAbility(ActionFeedbackText feedback)
         {
+            feedback.printMessage(user.getName() + " attacked everyone on the opposing team.");
             user.modifyStat(Stat.Attack, 0.6f);
             foreach (Team t in field.getTeams())
             {
@@ -20,7 +21,6 @@
                     }
                 }
             }
-            feedback.printMessage(user.getName() + " attacked everyone on the opposing team.");
         }
 
         public override bool isHighPriority()
