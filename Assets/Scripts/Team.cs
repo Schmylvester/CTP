@@ -139,6 +139,11 @@ public class Team
             if (u.grid_pos.x == col && u.getHealth() > 0)
                 return false;
         }
+        foreach(SummonedSkeleton u in skeletons)
+        {
+            if (u.grid_pos.x == col && u.getHealth() > 0)
+                return false;
+        }
         return true;
     }
 }
