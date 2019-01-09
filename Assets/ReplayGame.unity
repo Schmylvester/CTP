@@ -5939,7 +5939,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8cafafde1633f714ea9ce4acaf41f99b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  file_name: 19201951008PM
+  file_name: 19201953455PM
   field: {fileID: 1628121499}
   player_grids:
   - {fileID: 1971266735}
@@ -7815,6 +7815,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2057455338}
   - component: {fileID: 2057455335}
+  - component: {fileID: 2057455336}
   m_Layer: 0
   m_Name: ActionManager
   m_TagString: Untagged
@@ -7841,6 +7842,18 @@ MonoBehaviour:
   feedback_text: {fileID: 1689258007}
   replay: {fileID: 1628121500}
   from_file: 1
+--- !u!114 &2057455336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2057455334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74c914439a65b4942a81243f3f56a6ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  max_players: 2
 --- !u!4 &2057455338
 Transform:
   m_ObjectHideFlags: 0
