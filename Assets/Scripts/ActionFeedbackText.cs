@@ -52,6 +52,7 @@ public class ActionFeedbackText : MonoBehaviour
 
     public void clear()
     {
+        skeleton_died = false;
         messages_so_far = 0;
         for (int i = 0; i < text_box.Length; i++)
         {

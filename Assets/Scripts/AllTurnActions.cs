@@ -20,6 +20,8 @@ public class AllTurnActions : MonoBehaviour
     bool input_received = false;
     [SerializeField] PlayerGrid[] grids;
     [SerializeField] ActionFeedbackText feedback_text;
+    [SerializeField] ReplayGame replay;
+    [SerializeField] bool from_file;
 
     private void Start()
     {
@@ -37,16 +39,23 @@ public class AllTurnActions : MonoBehaviour
 
         if (received == 2)
         {
-            sortActionQueue();
+            addActionsToTracker();
             StartCoroutine(triggerActions());
             actions_complete = true;
             received = 0;
         }
     }
 
+    public void addActionsFromFile(List<Ability> actions)
+    {
+        foreach (Ability a in actions)
+            action_list_combined.Add(a);
+        StartCoroutine(triggerActions());
+    }
+
     IEnumerator triggerActions()
     {
-        addActionsToTracker();
+        sortActionQueue();
         feedback_text.setCount(action_list_combined.Count);
         foreach (Ability a in action_list_combined)
         {
@@ -91,7 +100,7 @@ public class AllTurnActions : MonoBehaviour
             }
 
             if (speed == Speed.Auto_Timer)
-                yield return new WaitForSeconds(3.0f);
+                yield return new WaitForSeconds(1.0f);
             else if (speed == Speed.Wait_For_Input)
             {
                 yield return new WaitUntil(() => input.buttonDown(XboxButton.A, 0) || input.buttonDown(XboxButton.A, 1));
@@ -101,9 +110,16 @@ public class AllTurnActions : MonoBehaviour
         }
         yield return new WaitForSeconds(1.0f);
         action_list_combined.Clear();
-        players[0].turnOver();
-        players[1].turnOver();
         feedback_text.clear();
+        if (from_file)
+        {
+            replay.setActions(1);
+        }
+        else
+        {
+            players[0].turnOver();
+            players[1].turnOver();
+        }
         yield return null;
     }
 
@@ -209,5 +225,6 @@ public class AllTurnActions : MonoBehaviour
             }
             tracker.addAction(data);
         }
+        tracker.actionsSetForTurn();
     }
 }

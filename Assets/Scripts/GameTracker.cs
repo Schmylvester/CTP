@@ -7,7 +7,6 @@ public struct UnitData
 {
     public short unit_id;
     public short unit_pos_x;
-    public short unit_pos_y;
 }
 
 public struct ActionData
@@ -51,7 +50,6 @@ public class GameTracker : MonoBehaviour
                 UnitData data = new UnitData();
                 data.unit_id = getID(unit);
                 data.unit_pos_x = (short)unit.grid_pos.x;
-                data.unit_pos_y = (short)unit.grid_pos.y;
                 setUnit(data);
             }
         }
@@ -61,9 +59,8 @@ public class GameTracker : MonoBehaviour
     {
         int new_data = 0;
 
-        new_data += data.unit_id * 16;
-        new_data += data.unit_pos_x * 4;
-        new_data += data.unit_pos_y;
+        new_data += data.unit_id * 4;
+        new_data += data.unit_pos_x;
 
         units += (char)new_data;
     }
@@ -80,14 +77,25 @@ public class GameTracker : MonoBehaviour
         actions += (char)new_data;
     }
 
+    public void actionsSetForTurn()
+    {
+        actions += (char)255;
+    }
+
+    private void OnApplicationQuit()
+    {
+        gameEnd();
+    }
+
     public void gameEnd()
     {
         file_writer = new StreamWriter("Assets\\Games\\" + dateWithoutSpace() + ".txt", true);
         if (file_writer != null)
         {
             file_writer.WriteLine(random_seed.ToString());
-            file_writer.WriteLine(units);
-            file_writer.WriteLine(actions);
+            file_writer.Write(units);
+            file_writer.Write((char)(255));
+            file_writer.Write(actions);
             file_writer.Close();
         }
     }

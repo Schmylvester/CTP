@@ -504,3 +504,5 @@ D:\CTP\obj\Debug\Assembly-CSharp.csproj.CoreCompileInputs.cache
 D:\CTP\obj\Debug\Assembly-CSharp.csproj.CopyComplete
 D:\CTP\obj\Debug\Assembly-CSharp.dll
 D:\CTP\obj\Debug\Assembly-CSharp.pdb
+D:\CTP\Temp\bin\Debug\Vuforia.UnityExtensions.dll
+D:\CTP\Temp\bin\Debug\Vuforia.UnityExtensions.xml

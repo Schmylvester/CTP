@@ -9,16 +9,20 @@ public class PlayerGrid : MonoBehaviour
     [SerializeField] UnitSprites sprites;
     [SerializeField] Transform[] columns;
     short[] units_in_col;
+    bool init = false;
 
-    private void Start()
+    private void initialise()
     {
         units_in_col = new short[columns.Length];
         for (int i = 0; i < units_in_col.Length; i++)
             units_in_col[i] = 0;
+        init = true;
     }
 
     public bool addUnitToCol(short col, Unit unit)
     {
+        if (!init)
+            initialise();
         if (units_in_col[col] >= columns[col].childCount)
         {
             return false;
