@@ -24,6 +24,7 @@ public class GameTracker : MonoBehaviour
     string actions = "";
     string units = "";
     StreamWriter file_writer;
+    bool saved = false;
 
     private void Awake()
     {
@@ -84,11 +85,13 @@ public class GameTracker : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        gameEnd();
+        if(!saved)
+            gameEnd();
     }
 
     public void gameEnd()
     {
+        saved = true;
         file_writer = new StreamWriter("Assets\\Games\\" + dateWithoutSpace() + ".txt", true);
         if (file_writer != null)
         {
