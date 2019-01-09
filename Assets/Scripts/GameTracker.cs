@@ -91,16 +91,24 @@ public class GameTracker : MonoBehaviour
 
     public void gameEnd()
     {
-        saved = true;
-        file_writer = new StreamWriter("Assets\\Games\\" + dateWithoutSpace() + ".txt", true);
-        if (file_writer != null)
+        if (!saved)
         {
-            file_writer.WriteLine(random_seed.ToString());
-            file_writer.Write(units);
-            file_writer.Write((char)(255));
-            file_writer.Write(actions);
-            file_writer.Close();
+            file_writer = new StreamWriter("Assets\\Games\\" + dateWithoutSpace() + ".txt", true);
+            if (file_writer != null)
+            {
+                file_writer.WriteLine(random_seed.ToString());
+                file_writer.Write(units);
+                file_writer.Write((char)(255));
+                file_writer.Write(actions);
+                file_writer.Close();
+            }
+            saved = true;
         }
+    }
+
+    public void disableSave()
+    {
+        saved = true;
     }
 
     string dateWithoutSpace()

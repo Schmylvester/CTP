@@ -68,6 +68,7 @@ public class ReplayGame : MonoBehaviour
             file.ReadBlock(action_char, file_index, 1);
             if (file_index >= 35)
             {
+                file.Close();
                 Debug.Log("Game Over");
                 enabled = false;
                 return;
@@ -143,5 +144,10 @@ public class ReplayGame : MonoBehaviour
                 return new Vampire();
         }
         return null;
+    }
+
+    private void OnApplicationQuit()
+    {
+        file.Close();
     }
 }
