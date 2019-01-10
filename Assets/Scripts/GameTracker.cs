@@ -5,8 +5,8 @@ using System.IO;
 
 public struct UnitData
 {
-    public short unit_id;
-    public short unit_pos_x;
+    public ushort unit_id;
+    public ushort unit_pos_x;
 }
 
 public struct ActionData
@@ -49,8 +49,8 @@ public class GameTracker : MonoBehaviour
             foreach (Unit unit in temp_list)
             {
                 UnitData data = new UnitData();
-                data.unit_id = getID(unit);
-                data.unit_pos_x = (short)unit.grid_pos.x;
+                data.unit_id = UnitIDs.getID(unit);
+                data.unit_pos_x = (ushort)unit.grid_pos.x;
                 setUnit(data);
             }
         }
@@ -123,28 +123,5 @@ public class GameTracker : MonoBehaviour
             }
         }
         return ret_str;
-    }
-
-    short getID(Unit u)
-    {
-        if (u as Bard != null)
-            return 0;
-        if (u as Cleric != null)
-            return 1;
-        if (u as Knight != null)
-            return 2;
-        if (u as Necromancer != null)
-            return 3;
-        if (u as Paladin != null)
-            return 4;
-        if (u as Pirate != null)
-            return 5;
-        if (u as Ranger != null)
-            return 6;
-        if (u as Rogue != null)
-            return 7;
-        if (u as Vampire != null)
-            return 8;
-        return -1;
     }
 }

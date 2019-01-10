@@ -37,14 +37,14 @@ public class ReplayGame : MonoBehaviour
         Unit[][] team = new Unit[2][] { new Unit[5], new Unit[5] };
         for (int i = 0; i < 10; i++)
         {
-            short unit = (short)_char[i + 1];
-            data[i].unit_id = (short)(unit / 4);
-            unit = (short)(unit % 4);
+            ushort unit = (ushort)_char[i + 1];
+            data[i].unit_id = (ushort)(unit / 4);
+            unit = (ushort)(unit % 4);
             data[i].unit_pos_x = unit;
             if (i < 5)
-                team[0][i] = getUnit(data[i].unit_id);
+                team[0][i] = UnitIDs.getUnit(data[i].unit_id);
             else
-                team[1][i - 5] = getUnit(data[i].unit_id);
+                team[1][i - 5] = UnitIDs.getUnit(data[i].unit_id);
         }
         for (int i = 0; i < 2; i++)
         {
@@ -120,31 +120,6 @@ public class ReplayGame : MonoBehaviour
         all_actions.addActionsFromFile(actions);
     }
 
-    Unit getUnit(short id)
-    {
-        switch (id)
-        {
-            case 0:
-                return new Bard();
-            case 1:
-                return new Cleric();
-            case 2:
-                return new Knight();
-            case 3:
-                return new Necromancer();
-            case 4:
-                return new Paladin();
-            case 5:
-                return new Pirate();
-            case 6:
-                return new Ranger();
-            case 7:
-                return new Rogue();
-            case 8:
-                return new Vampire();
-        }
-        return null;
-    }
 
     private void OnApplicationQuit()
     {
