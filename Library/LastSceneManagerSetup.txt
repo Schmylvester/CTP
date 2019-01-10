@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/ReplayGame.unity
+- path: Assets/Scenes/UnitSelection.unity
   isLoaded: 1
   isActive: 1

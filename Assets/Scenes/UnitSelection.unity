@@ -509,6 +509,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 257286216}
+  - component: {fileID: 257286217}
   m_Layer: 0
   m_Name: TeamPredict
   m_TagString: Untagged
@@ -529,6 +530,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &257286217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 257286215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba9547eca9bba5842b3794bbedfa1bd4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  k: 3
 --- !u!1 &301962490
 GameObject:
   m_ObjectHideFlags: 0
@@ -678,6 +691,7 @@ MonoBehaviour:
   ready_light: {fileID: 301962492}
   unit_manager: {fileID: 1131351679}
   input: {fileID: 722928446}
+  predict: {fileID: 257286217}
 --- !u!114 &316789217
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1543,6 +1557,7 @@ MonoBehaviour:
   ready_light: {fileID: 1890945810}
   unit_manager: {fileID: 1131351679}
   input: {fileID: 722928446}
+  predict: {fileID: 257286217}
 --- !u!1 &574721704
 GameObject:
   m_ObjectHideFlags: 0
