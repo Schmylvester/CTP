@@ -111,6 +111,7 @@
     <Compile Include="Assets\Scripts\Gameplay\UnitSelection.cs" />
     <Compile Include="Assets\Scripts\Gameplay\UnitSprites.cs" />
     <Compile Include="Assets\Scripts\GameTracker.cs" />
+    <Compile Include="Assets\Scripts\Globals.cs" />
     <Compile Include="Assets\Scripts\Prediction\ActionPrediction.cs" />
     <Compile Include="Assets\Scripts\Prediction\AddToPredictionFile.cs" />
     <Compile Include="Assets\Scripts\Prediction\PredictTeam.cs" />
@@ -122,6 +123,7 @@
     <None Include="Assets\Games\111201993216PM.txt" />
     <None Include="Assets\Games\111201993140PM.txt" />
     <None Include="Assets\Games\111201995412PM.txt" />
+    <None Include="Assets\Games\114201995958AM.txt" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>D:/CTP/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>

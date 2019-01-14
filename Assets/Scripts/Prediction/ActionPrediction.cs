@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Abilities;
+using System.IO;
 
 public struct PredictionInput   //per unit
 {
@@ -30,6 +31,70 @@ public class ActionPrediction : MonoBehaviour
     [SerializeField] ushort kNN = 5;
     List<Prediction> all_prev_actions = new List<Prediction>();
 
+    /// <summary>
+    /// Opens the file and gets all the data ready
+    /// </summary>
+    /// <returns>nuttin</returns>
+    IEnumerator loadPreviousActions()
+    {
+        StreamReader file_reader = new StreamReader("Assets\\Prediction\\ActionPrediction.txt");
+        int count_break = 0;
+        while (!file_reader.EndOfStream)
+        {
+            List<PredictionInput> input = new List<PredictionInput>();
+            char[] char_out = new char[1];
+            while(file_reader.Peek() != 255)
+            {
+                if (count_break++ == int.MaxValue)
+                {
+                    Debug.LogError("There was an error with the while loops");
+                    Application.Quit();
+                    yield return null;
+                }
+                PredictionInput one_in = new PredictionInput();
+                file_reader.Read(char_out, 0, 1);
+                short unit = short.Parse(char_out[0].ToString());
+                for (short i = 0; i < Globals.unit_count; i++)
+                {
+                    if (i == unit)
+                    {
+                        one_in.unit_id[i] = 1;
+                    }
+                    else
+                    {
+                        one_in.unit_id[i] = 0;
+                    }
+                }
+                file_reader.Read(char_out, 0, 1);
+                one_in.unit_x = (short)char_out[0];
+                file_reader.Read(char_out, 0, 1);
+                one_in.health = (float)(char_out[0]) / 250;
+
+                input.Add(one_in);
+            }
+            file_reader.Read(char_out, 0, 1);
+            ushort act = char_out[0];
+            file_reader.Read(char_out, 0, 1);
+            ushort target = char_out[0];
+            PredictionOutput output = new PredictionOutput() { action = act, target = target };
+            Prediction previous_behaviour = new Prediction()
+            {
+                input = input.ToArray(),
+                output = output,
+                dist = float.MaxValue
+            };
+            all_prev_actions.Add(previous_behaviour);
+        }
+        file_reader.Close();
+        yield return null;
+    }
+
+    /// <summary>
+    /// Based on the current game state, makes a prediction as to the best action
+    /// </summary>
+    /// <param name="current_state">Units and their data</param>
+    /// <param name="active_unit">Currently in play</param>
+    /// <returns>What the best ability might be</returns>
     Ability makePrediction(PredictionInput[] current_state, Unit active_unit)
     {
         countDistances(current_state);
@@ -52,6 +117,10 @@ public class ActionPrediction : MonoBehaviour
         return getAbility(outputs, active_unit);
     }
 
+    /// <summary>
+    /// Gets the distances between all previous inputs and the current one
+    /// </summary>
+    /// <param name="current_state">The current input state</param>
     void countDistances(PredictionInput[] current_state)
     {
         for (int prev_action = 0; prev_action < all_prev_actions.Count; prev_action++)
@@ -71,11 +140,17 @@ public class ActionPrediction : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Takes the best kNN outputs and makes them into one ability
+    /// </summary>
+    /// <param name="outputs">The best outputs from the kNN</param>
+    /// <param name="active_unit">The unit currently playing</param>
+    /// <returns>The best prediction for an action</returns>
     Ability getAbility(PredictionOutput[] outputs, Unit active_unit)
     {
         ushort[] actions = new ushort[outputs.Length];
         ushort[] targets = new ushort[outputs.Length];
-        for(int i = 0; i < outputs.Length; i++)
+        for (int i = 0; i < outputs.Length; i++)
         {
             actions[i] = outputs[i].action;
             targets[i] = outputs[i].target;
@@ -83,7 +158,7 @@ public class ActionPrediction : MonoBehaviour
 
         Ability output = null;
         ushort best_action = getBest(actions, 5);
-        switch(best_action)
+        switch (best_action)
         {
             case 0:
                 output = new Attack();
@@ -106,20 +181,28 @@ public class ActionPrediction : MonoBehaviour
         output.setUser(active_unit);
         output.setTarget(field.findUnitAtPos(x, y, team));
 
-        if(output.getTarget() == null &! output.noTarget())
-        {
-            Debug.LogError("There was an error with target");
-        }
-
         string best_guess = "Best guess is that " + active_unit.getName() + " will use " + output.ability_name;
         if (!output.noTarget())
         {
-            best_guess +=  " on " + output.getTarget().getName();
+            if (output.getTarget() == null)
+            {
+                best_guess += " but I will need more information to decide which unit.";
+            }
+            else
+            {
+                best_guess += " on " + output.getTarget().getName();
+            }
         }
         Debug.Log(best_guess);
         return output;
     }
 
+    /// <summary>
+    /// Finds the index of the best value in a list of values
+    /// </summary>
+    /// <param name="values">The list of values</param>
+    /// <param name="max_val">How many different values there are</param>
+    /// <returns>Index of the highest value</returns>
     ushort getBest(ushort[] values, short max_val)
     {
         ushort[] counts = new ushort[max_val];
@@ -137,13 +220,13 @@ public class ActionPrediction : MonoBehaviour
             }
         }
         ushort best = 0;
-        for(ushort i = 1; i < max_val; i++)
+        for (ushort i = 1; i < max_val; i++)
         {
-            if(counts[i] > counts[best])
+            if (counts[i] > counts[best])
             {
                 best = i;
             }
-            else if(counts[i] == counts[best])
+            else if (counts[i] == counts[best])
             {
                 best = Random.Range(0, 2) == 0 ? best : i;
             }
@@ -152,6 +235,11 @@ public class ActionPrediction : MonoBehaviour
         return best;
     }
 
+    /// <summary>
+    /// Makes a unit into the input values needed for each unit
+    /// </summary>
+    /// <param name="unit">The unit in play</param>
+    /// <returns>Their id, position and health as it's needed by the struct</returns>
     public static PredictionInput getPredictionInput(Unit unit)
     {
         PredictionInput ret_val = new PredictionInput
