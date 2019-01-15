@@ -46,7 +46,6 @@ public class Evolution : MonoBehaviour
         for (int i = 0; i < all_fighters.Count; i++)
         {
             all_fighters[i].mutate();
-            all_fighters[i].heal();
         }
 
         winners.Clear();

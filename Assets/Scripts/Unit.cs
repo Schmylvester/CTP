@@ -4,59 +4,35 @@ using UnityEngine;
 
 public enum Stat
 {
-    ATTACK,         //Do more damage
-    ATTACK_RANGE,   //Attack further away
-    DEFENCE,        //Take less damage
-    MOVE,           //Move further
-    CHARISMA,       //Boost ally stats
-    INTELLIGENCE,   //Ability to do magic
-    SIGHT,          //They see further
-    AGILITY,        //They're harder to see
-    ACCURACY,       //Their attack is more likely to hit
-    DODGE,          //Attacks are less likely to hit them    
+    Attack, Defence, Speed,
 
     Count
 }
 
 public class Unit
 {
-    Class _class;
     Vector2Int position;
-
-    int max_health = 50;
+    
     int max_total_stats = 40;
-    int health;
     int[] tracked_stats;
 
     public Unit(int[] new_stats)
     {
         tracked_stats = new int[(int)Stat.Count];
-        health = max_health;
         for (int i = 0; i < (int)Stat.Count; i++)
         {
             tracked_stats[i] = new_stats[i];
         }
     }
 
-    public void attack(Unit target)
+    public Unit attack(Unit target)
     {
-        if (getStat(Stat.MOVE) > target.getStat(Stat.MOVE))
-        {
-            target.takeDamage(getStat(Stat.ATTACK) * 3);
-        }
-        else
-        {
-            target.takeDamage(getStat(Stat.ATTACK) * 2);
-        }
-    }
+        int my_stats = getStat(Stat.Attack) + getStat(Stat.Defence) + getStat(Stat.Speed);
+        int their_stats = target.getStat(Stat.Attack) + target.getStat(Stat.Defence) + target.getStat(Stat.Speed);
 
-    public int takeDamage(int damage)
-    {
-        damage -= getStat(Stat.DEFENCE);
-        //always 1 damage at least
-        damage = damage > 1 ? damage : 1;
-        health -= damage;
-        return damage;
+        if (my_stats > their_stats)
+            return this;
+        return target;
     }
 
     public void mutate()
@@ -96,23 +72,6 @@ public class Unit
     public int getStat(Stat stat)
     {
         return tracked_stats[(int)stat];
-    }
-    public bool getAlive()
-    {
-        return health > 0;
-    }
-    public void heal(int by = -1)
-    {
-        health += by;
-        if (by == -1 || health > max_health)
-        {
-            health = max_health;
-        }
-    }
-
-    public void setClass(Class new_class)
-    {
-        _class = new_class;
     }
     #endregion
 }
