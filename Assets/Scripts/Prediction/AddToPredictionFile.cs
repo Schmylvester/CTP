@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
-public class AddTeamToFile : MonoBehaviour
+public class AddToPredictionFile : MonoBehaviour
 {
     public static void addTeam(Unit[] units)
     {
@@ -15,14 +15,14 @@ public class AddTeamToFile : MonoBehaviour
         file_writer.Close();
     }
 
-    public void createActionMap(Field field, Ability ability_selected)
+    public static void addAction(Field field, Ability ability_selected)
     {
         PredictionInput[] inputs = getInput(field, ability_selected.getUser());
         PredictionOutput output = getOutput(ability_selected);
-        StartCoroutine(addAction(inputs, output));
+        addAction(inputs, output);
     }
 
-    PredictionInput[] getInput(Field field, Unit active_unit)
+    public static PredictionInput[] getInput(Field field, Unit active_unit)
     {
         List<PredictionInput> inputs = new List<PredictionInput>();
         inputs.Add(ActionPrediction.getPredictionInput(active_unit));
@@ -40,7 +40,7 @@ public class AddTeamToFile : MonoBehaviour
         return inputs.ToArray();
     }
 
-    PredictionOutput getOutput(Ability ability)
+    static PredictionOutput getOutput(Ability ability)
     {
         Unit target = ability.getTarget();
         Unit actor = ability.getUser();
@@ -74,7 +74,7 @@ public class AddTeamToFile : MonoBehaviour
         return new PredictionOutput() { action = act_out, target = target_loc, };
     }
 
-    IEnumerator addAction(PredictionInput[] inputs, PredictionOutput output)
+   static void addAction(PredictionInput[] inputs, PredictionOutput output)
     {
         string line = "";
         foreach (PredictionInput input in inputs)
@@ -100,6 +100,5 @@ public class AddTeamToFile : MonoBehaviour
         StreamWriter file_writer = new StreamWriter("Assets\\Prediction\\ActionPrediction.txt", true);
         file_writer.Write(line);
         file_writer.Close();
-        yield return null;
     }
 }

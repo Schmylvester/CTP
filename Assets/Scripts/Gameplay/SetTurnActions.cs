@@ -46,6 +46,7 @@ public class SetTurnActions : MonoBehaviour
     char move_dir = '\0';
     short col_selected;
     Ability action;
+    [SerializeField] ActionPrediction prediction;
 
     private void Start()
     {
@@ -62,6 +63,11 @@ public class SetTurnActions : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            prediction.makePrediction(AddToPredictionFile.getInput(field, team.getUnits(true)[acting_unit]), team.getUnits(true)[acting_unit]);
+        }
+
         if (!inputs_sent)
         {
             if (team.stillInGame())
@@ -175,6 +181,7 @@ public class SetTurnActions : MonoBehaviour
                 bool valid = (action.targetValid(feedback) && action.canUse());
                 if (valid)
                 {
+                    AddToPredictionFile.addAction(field, action);
                     action_queue.Add(action);
                     acting_unit++;
                     grid.getSprite(u).color = Color.white;

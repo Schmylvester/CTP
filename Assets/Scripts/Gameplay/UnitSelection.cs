@@ -188,7 +188,7 @@ public class UnitSelection : MonoBehaviour
         {
             team[i] = UnitIDs.getUnit(units_on_team[i]);
         }
-        AddTeamToFile.addTeam(team);
+        AddToPredictionFile.addTeam(team);
         unit_manager.setTeam(player_id, team);
     }
 

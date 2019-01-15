@@ -27,9 +27,15 @@ public struct Prediction
 
 public class ActionPrediction : MonoBehaviour
 {
-    [SerializeField] Field field;
     [SerializeField] ushort kNN = 5;
+    Field field;
     List<Prediction> all_prev_actions = new List<Prediction>();
+
+    private void Start()
+    {
+        field = FindObjectOfType<Field>();
+        StartCoroutine(loadPreviousActions());
+    }
 
     /// <summary>
     /// Opens the file and gets all the data ready
@@ -43,7 +49,8 @@ public class ActionPrediction : MonoBehaviour
         {
             List<PredictionInput> input = new List<PredictionInput>();
             char[] char_out = new char[1];
-            while(file_reader.Peek() != 255)
+            short short_out;
+            while (short.TryParse(((char)file_reader.Peek()).ToString(), out short_out))
             {
                 if (count_break++ == int.MaxValue)
                 {
@@ -51,7 +58,7 @@ public class ActionPrediction : MonoBehaviour
                     Application.Quit();
                     yield return null;
                 }
-                PredictionInput one_in = new PredictionInput();
+                PredictionInput one_in = new PredictionInput() { unit_id = new short[9] };
                 file_reader.Read(char_out, 0, 1);
                 short unit = short.Parse(char_out[0].ToString());
                 for (short i = 0; i < Globals.unit_count; i++)
@@ -73,7 +80,8 @@ public class ActionPrediction : MonoBehaviour
                 input.Add(one_in);
             }
             file_reader.Read(char_out, 0, 1);
-            ushort act = char_out[0];
+            file_reader.Read(char_out, 0, 1);
+            ushort act = ushort.Parse(char_out[0].ToString());
             file_reader.Read(char_out, 0, 1);
             ushort target = char_out[0];
             PredictionOutput output = new PredictionOutput() { action = act, target = target };
@@ -95,7 +103,7 @@ public class ActionPrediction : MonoBehaviour
     /// <param name="current_state">Units and their data</param>
     /// <param name="active_unit">Currently in play</param>
     /// <returns>What the best ability might be</returns>
-    Ability makePrediction(PredictionInput[] current_state, Unit active_unit)
+    public Ability makePrediction(PredictionInput[] current_state, Unit active_unit)
     {
         countDistances(current_state);
 
@@ -174,7 +182,7 @@ public class ActionPrediction : MonoBehaviour
         }
 
         ushort best_target = getBest(targets, 32);
-        short team = (short)(best_target < 16 ? 0 : 1);
+        short team = (short)(best_target < 16 ? active_unit.getTeam().player_id : 1 - active_unit.getTeam().player_id);
         short x = (short)(best_target % 4);
         short y = (short)((best_target - (team * 16)) / 4);
 
@@ -186,12 +194,29 @@ public class ActionPrediction : MonoBehaviour
         {
             if (output.getTarget() == null)
             {
-                best_guess += " but I will need more information to decide which unit.";
+                for (short i = 0; i < 4; i++)
+                {
+                    output.setTarget(field.findUnitAtPos(x, i, team));
+                    if (output.getTarget() != null)
+                        break;
+                }
+                if(output.getTarget() == null)
+                {
+                    for (short i = 0; i < 4; i++)
+                    {
+                        for (short j = 0; j < 4; j++)
+                        {
+                            output.setTarget(field.findUnitAtPos(i, j, team));
+                            if (output.getTarget() != null)
+                                break;
+                        }
+                        if (output.getTarget() != null)
+                            break;
+                    }
+                }
             }
-            else
-            {
-                best_guess += " on " + output.getTarget().getName();
-            }
+
+            best_guess += " on " + output.getTarget().getName();
         }
         Debug.Log(best_guess);
         return output;
@@ -210,14 +235,7 @@ public class ActionPrediction : MonoBehaviour
             counts[i] = 0;
         foreach (ushort val in values)
         {
-            for (int i = 0; i < max_val; i++)
-            {
-                if (val == i)
-                {
-                    counts[i]++;
-                    break;
-                }
-            }
+            counts[val]++;
         }
         ushort best = 0;
         for (ushort i = 1; i < max_val; i++)
@@ -231,7 +249,6 @@ public class ActionPrediction : MonoBehaviour
                 best = Random.Range(0, 2) == 0 ? best : i;
             }
         }
-
         return best;
     }
 
