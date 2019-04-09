@@ -42,15 +42,18 @@ public class AddToPredictionFile : MonoBehaviour
 
     static PredictionOutput getOutput(Ability ability)
     {
-        Unit target = ability.getTarget();
         Unit actor = ability.getUser();
+        Unit target = ability.getTarget();
         ushort target_loc = 0;
-        if (target.getTeam() != actor.getTeam())
+        if (target != null)
         {
-            target_loc += 16;
+            if (target.getTeam() != actor.getTeam())
+            {
+                target_loc += 16;
+            }
+            target_loc += (ushort)(target.grid_pos.y * 4);
+            target_loc += (ushort)(target.grid_pos.x);
         }
-        target_loc += (ushort)(target.grid_pos.y * 4);
-        target_loc += (ushort)(target.grid_pos.x);
 
         ushort act_out = 0;
         if (ability.ability_name == "Attack")
@@ -74,7 +77,7 @@ public class AddToPredictionFile : MonoBehaviour
         return new PredictionOutput() { action = act_out, target = target_loc, };
     }
 
-   static void addAction(PredictionInput[] inputs, PredictionOutput output)
+    static void addAction(PredictionInput[] inputs, PredictionOutput output)
     {
         string line = "";
         foreach (PredictionInput input in inputs)
